@@ -1,0 +1,40 @@
+{
+  "name": "@shopgate-project/yotpo-enablement",
+  "version": "1.0.0",
+  "description": "Allows customers to leave and read yotpo reviews for merchant's products",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "npm run test -- --watch",
+    "coverage": "jest --coverage",
+    "coverage:watch": "npm run coverage -- --watch"
+  },
+  "devDependencies": {
+    "@shopgate/eslint-config": "^6.1.0",
+    "@shopgate/pwa-common": "^6.1.0",
+    "@shopgate/pwa-common-commerce": "^6.1.0",
+    "@shopgate/pwa-core": "^6.1.0",
+    "@shopgate/pwa-unit-test": "^6.1.0",
+    "@shopgate/react-hammerjs": "^0.5.8",
+    "babel-core": "^6.26.0",
+    "babel-plugin-react-transform": "^3.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-export-extensions": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-react-inline-elements": "^6.22.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "prop-types": "^15.6.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-hot-loader": "4.0.1",
+    "react-transform-catch-errors": "^1.0.2",
+    "redbox-react": "^1.5.0"
+  },
+  "peerDependencies": {
+    "@shopgate/pwa-core": "^6.1.0",
+    "@shopgate/pwa-common": "^6.1.0",
+    "@shopgate/pwa-common-commerce": "^6.1.0"
+  }
+}

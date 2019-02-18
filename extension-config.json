@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "id": "@shopgate-project/yotpo-enablement",
+  "components": [
+    {
+      "id": "pdpYotpoScript",
+      "path": "frontend/portals/ProductDescriptionAfter",
+      "target": "product.properties.after",
+      "type": "portals"
+    },
+    {
+      "id": "disableDefaultReviews",
+      "path": "frontend/portals/DisableProductReviews",
+      "target": "product.reviews",
+      "type": "portals"
+    }
+  ],
+  "configuration": {
+    "yotpoAppKey": {
+      "type": "admin",
+      "destination": "frontend",
+      "default": null,
+      "params": {
+        "required": true,
+        "type": "string",
+        "label": "Yotpo App Key"
+      }
+    }
+  }
+}
