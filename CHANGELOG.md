@@ -6,4 +6,4 @@
 First version of the extension.
 ### Added
 - Added support for Yotpo reviews on the connect platform.
-- You can configure an the Yotpo app key for specific merchant
+- You can configure a Yotpo app key for specific merchant.

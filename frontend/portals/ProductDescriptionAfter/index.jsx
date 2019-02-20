@@ -5,6 +5,9 @@ import { hex2bin } from '@shopgate/pwa-common/helpers/data';
 import YotpoWidget from '../../components/YotpoWidget';
 import getConfig from '../../helpers/getConfig';
 import connect from './connector';
+
+const config = getConfig();
+
 /**
  * @param {string} productId productId
  * @param {Object} config config
@@ -13,7 +16,6 @@ import connect from './connector';
 const YotpoWidgetContext = connect(({
   productId,
   product,
-  config,
 }) => (
   <YotpoWidget
     product={product}
@@ -59,6 +61,9 @@ class productDescriptionAfter extends Component {
    * Registers the event handler for when the user taps inside the html content.
    */
   componentDidMount() {
+    if (!config.yotpoAppKey) {
+      return;
+    }
     this.htmlContainer.current.addEventListener('touchstart', this.handleTap, true);
     this.htmlContainer.current.addEventListener('click', this.handleTap, true);
   }
@@ -67,6 +72,9 @@ class productDescriptionAfter extends Component {
    * Removes the event handler.
    */
   componentWillUnmount() {
+    if (!config.yotpoAppKey) {
+      return;
+    }
     this.htmlContainer.current.removeEventListener('touchstart', this.handleTap, true);
     this.htmlContainer.current.removeEventListener('click', this.handleTap, true);
   }
@@ -89,8 +97,6 @@ class productDescriptionAfter extends Component {
    * @returns {jSX}
    */
   render() {
-    const config = getConfig();
-
     if (!config.yotpoAppKey) {
       return null;
     }
