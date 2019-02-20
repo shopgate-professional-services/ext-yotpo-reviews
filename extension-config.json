@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "id": "@shopgate-project/yotpo-enablement",
+  "id": "@shopgate-ps/yotpo-enablement",
   "components": [
     {
       "id": "pdpYotpoScript",
