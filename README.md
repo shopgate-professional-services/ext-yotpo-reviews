@@ -1,8 +1,18 @@
 # ext-yotpo-reviews
-Allows customers to leave and read yotpo reviews for merchant's products
+Allows customers to leave and read yotpo reviews for merchant's products. In order to enable Yotpo reviews you must configure the yotpo app key in your connect admin. The input takes the merchant's app key as a string.
 
-## Extension Configuration
-In order to enable Yotpo reviews you must configure the yotpo app key in your connect admin. The input takes the merchant's app key as a string.
+## Configuration
+Add the yotpo-reviews extension to your Shopgate Connect deployment config.
+```
+(...)
+  {
+    "id": "@shopgate-project/yotpo-reviews",
+    "version": "1.0.0"
+  }
+(...)
+```
+Set the following value in your Shopgate Connect Admin:
+* yotpoAppKey - (string) Merchants app key provided my Yotpo.
 
 ## Changelog
 

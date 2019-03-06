@@ -1,16 +1,10 @@
 {
   "version": "1.0.0",
-  "id": "@shopgate-ps/yotpo-enablement",
+  "id": "@shopgate-project/yotpo-reviews",
   "components": [
     {
       "id": "pdpYotpoScript",
-      "path": "frontend/portals/ProductDescriptionAfter",
-      "target": "product.properties.after",
-      "type": "portals"
-    },
-    {
-      "id": "disableDefaultReviews",
-      "path": "frontend/portals/DisableProductReviews",
+      "path": "frontend/portals/ProductReviews",
       "target": "product.reviews",
       "type": "portals"
     }

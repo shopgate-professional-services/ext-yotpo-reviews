@@ -30,7 +30,7 @@ exports[`<YotpoWidget /> should render yotpo divs when a product is passed 1`] =
 >
   <div>
     <div
-      className="yotpo bottomLine"
+      className="yotpo bottomLine css-1gv7y8"
       data-appkey="null"
       data-description=""
       data-domain=""
@@ -40,7 +40,7 @@ exports[`<YotpoWidget /> should render yotpo divs when a product is passed 1`] =
       data-url="wwww.123.com"
     />
     <div
-      className="yotpo yotpo-main-widget"
+      className="yotpo yotpo-main-widget css-1yfwcul css-1gv7y8"
       data-description=""
       data-image-url="www.123456.com"
       data-name="item"

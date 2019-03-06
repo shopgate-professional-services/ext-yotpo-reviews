@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import mountScript from '../../helpers/mountScript';
+import styles from './style';
+import getYotpo from '../../helpers/getYotpo';
 
 /**
  * Mounts yotpo script.
@@ -21,7 +22,7 @@ class YotpoScript extends Component {
    */
   componentDidMount() {
     if (!window.yotpo) {
-      mountScript(this.props.config.yotpoAppKey);
+      getYotpo(this.props.config.yotpoAppKey);
       return;
     }
     window.yotpo.initialized = false;
@@ -37,6 +38,7 @@ class YotpoScript extends Component {
     if (this.props.productId !== prevProps.productId) {
       window.yotpo.initialized = false;
       window.yotpo.clean();
+      // 1500 Additional ms to account for refresh of widget properties and fetching of new widget.
       setTimeout(() => {
         window.yotpo.refreshWidgets();
         window.yotpo.initWidgets();
@@ -55,7 +57,7 @@ class YotpoScript extends Component {
     return (
       <div>
         <div
-          className="yotpo bottomLine"
+          className={`yotpo bottomLine ${styles.padding}`}
           data-appkey={`${this.props.config.yotpoAppKey}`}
           data-domain=""
           data-product-id={`${this.props.productId}`}
@@ -65,7 +67,7 @@ class YotpoScript extends Component {
           data-description=""
         />
         <div
-          className="yotpo yotpo-main-widget"
+          className={`yotpo yotpo-main-widget ${styles.container} ${styles.padding}`}
           data-product-id={`${this.props.productId}`}
           data-name={`${this.props.product.name}`}
           data-url={`${this.props.product.productUrl}`}

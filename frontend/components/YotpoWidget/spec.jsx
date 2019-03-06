@@ -1,9 +1,9 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import YotpoWidget from './index';
-import mountScript from '../../helpers/mountScript';
+import getYotpo from '../../helpers/getYotpo';
 
-jest.mock('../../helpers/mountScript');
+jest.mock('../../helpers/getYotpo');
 const noProduct = null;
 const product = {
   name: 'item',
@@ -33,7 +33,7 @@ describe('<YotpoWidget />', () => {
     ));
     const renderedInstance = wrapper.instance();
     renderedInstance.componentDidMount();
-    expect(mountScript).toHaveBeenCalled();
+    expect(getYotpo).toHaveBeenCalled();
   });
   it('should call clean from window.yotpo', () => {
     window.yotpo = {

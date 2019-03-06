@@ -1,11 +1,11 @@
-import mountScript from './mountScript';
+import getYotpo from './getYotpo';
 
 describe('mountScript', () => {
-  it('should run mountScript', () => {
+  it('should inject yotpo script', () => {
     document.head.innerHTML =
     '<head>' +
     '</head>';
-    mountScript('mock');
+    getYotpo('mock');
     expect(document.head.getElementsByTagName('script')).toBeTruthy();
   });
 });
