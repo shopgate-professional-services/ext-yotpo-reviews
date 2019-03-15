@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import YotpoWidget from '../YotpoWidget';
+import YotpoWidget from './components/YotpoWidget';
 
 /**
  * Creates Reference to acces DOM nodes
@@ -57,7 +57,7 @@ class HtmlReferenceContainer extends Component {
     const aTag = event.target.closest('a');
     const dataNetworkAttribute = event.target.closest('.yotpo-icon-btn');
 
-    if (aTag && aTag.attributes.href) {
+    if (aTag && aTag.attributes.href && !aTag.classList.contains('yotpo-icon')) {
       event.preventDefault();
       const href = aTag.attributes.href.value;
       this.props.navigate(href);

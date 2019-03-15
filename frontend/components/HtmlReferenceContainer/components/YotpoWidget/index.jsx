@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './style';
-import getYotpo from '../../helpers/getYotpo';
+import getYotpo from '../../../../helpers/getYotpo';
 
 /**
  * Mounts yotpo script.
@@ -18,6 +18,16 @@ class YotpoScript extends Component {
   }
 
   /**
+   * Constructs
+   * @param {Objects} props props
+   */
+  constructor(props) {
+    super(props);
+    this.yotpoMountTimeout = undefined;
+    this.yotpoRefreshTimeout = undefined;
+  }
+
+  /**
    * Mounts Yotpo script.
    */
   componentDidMount() {
@@ -27,7 +37,10 @@ class YotpoScript extends Component {
     }
     window.yotpo.initialized = false;
     window.yotpo.clean();
-    setTimeout(() => { window.yotpo.initWidgets(); }, 500);
+    this.yotpoMountTimeout = setTimeout(() => {
+      window.yotpo.initWidgets();
+      this.yotpoMountTimeout = undefined;
+    }, 500);
   }
 
   /**
@@ -39,10 +52,23 @@ class YotpoScript extends Component {
       window.yotpo.initialized = false;
       window.yotpo.clean();
       // 1500 Additional ms to account for refresh of widget properties and fetching of new widget.
-      setTimeout(() => {
+      this.yotpoRefreshTimeout = setTimeout(() => {
         window.yotpo.refreshWidgets();
         window.yotpo.initWidgets();
+        this.yotpoRefreshTimeout = undefined;
       }, 2000);
+    }
+  }
+
+  /**
+   * Cleanup timeout request
+   */
+  componentWillUnmount() {
+    if (this.yotpoMountTimeout) {
+      clearTimeout(this.yotpoMountTimeout);
+    }
+    if (this.yotpoRefreshTimeout) {
+      clearTimeout(this.yotpoRefreshTimeout);
     }
   }
 

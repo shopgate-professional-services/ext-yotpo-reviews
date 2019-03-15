@@ -14,7 +14,7 @@ function mountScript(config) {
 
 /**
  * Tries to get Yotpo from window Object. If not yet available, tries again.
- * @param {function} resolve Promise.resolve function
+ * @param {func} resolve Promise.resolve function
  */
 function tryYotpo(resolve) {
   if (window.Yotpo) {

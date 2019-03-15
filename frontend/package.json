@@ -11,11 +11,11 @@
     "coverage:watch": "npm run coverage -- --watch"
   },
   "devDependencies": {
-    "@shopgate/eslint-config": "^6.1.1",
-    "@shopgate/pwa-common": "^6.1.1",
-    "@shopgate/pwa-common-commerce": "^6.1.1",
-    "@shopgate/pwa-core": "^6.1.1",
-    "@shopgate/pwa-unit-test": "^6.1.1",
+    "@shopgate/eslint-config": "^6.2.1",
+    "@shopgate/pwa-common": "^6.2.1",
+    "@shopgate/pwa-common-commerce": "^6.2.1",
+    "@shopgate/pwa-core": "^6.2.1",
+    "@shopgate/pwa-unit-test": "^6.2.1",
     "@shopgate/react-hammerjs": "^0.5.8",
     "babel-core": "^6.26.0",
     "babel-plugin-react-transform": "^3.0.0",
@@ -26,6 +26,7 @@
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
+    "eslint": "^4.19.1",
     "jest": "^22.4.2",
     "jsdom": "11.1.0",
     "prop-types": "^15.6.0",
@@ -36,8 +37,8 @@
     "redbox-react": "^1.5.0"
   },
   "peerDependencies": {
-    "@shopgate/pwa-core": "^6.1.1",
-    "@shopgate/pwa-common": "^6.1.1",
-    "@shopgate/pwa-common-commerce": "^6.1.1"
+    "@shopgate/pwa-core": "^6.2.1",
+    "@shopgate/pwa-common": "^6.2.1",
+    "@shopgate/pwa-common-commerce": "^6.2.1"
   }
 }

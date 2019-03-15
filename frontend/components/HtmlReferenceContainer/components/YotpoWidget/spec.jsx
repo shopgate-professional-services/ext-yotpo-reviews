@@ -1,9 +1,9 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import YotpoWidget from './index';
-import getYotpo from '../../helpers/getYotpo';
+import getYotpo from '../../../../helpers/getYotpo';
 
-jest.mock('../../helpers/getYotpo');
+jest.mock('../../../../helpers/getYotpo');
 const noProduct = null;
 const product = {
   name: 'item',
