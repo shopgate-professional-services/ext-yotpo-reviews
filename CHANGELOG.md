@@ -9,4 +9,4 @@ First version of the extension.
 - You can configure a Yotpo app key for specific merchant.
 - Connect to write a Review is not included in this integration.
 ### Diff
-- [0.0.1 - 1.0.0.beta-1](https://github.com/shopgate-professional-services/ext-yotpo-reviews/compare/v0.0.1...v1.0.0.beta-1)
+- [0.0.1 - 1.0.0-beta.1](https://github.com/shopgate-professional-services/ext-yotpo-reviews/compare/v0.0.1...v1.0.0-beta.1)
