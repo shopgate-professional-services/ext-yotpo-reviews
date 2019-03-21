@@ -9,12 +9,12 @@ class HtmlReferenceContainer extends Component {
   static propTypes = {
     config: PropTypes.shape().isRequired,
     productId: PropTypes.string.isRequired,
-    navigate: PropTypes.func,
+    openPageExtern: PropTypes.func,
     product: PropTypes.shape(),
   };
 
   static defaultProps = {
-    navigate: () => {},
+    openPageExtern: () => {},
     product: {},
   }
 
@@ -55,37 +55,14 @@ class HtmlReferenceContainer extends Component {
    */
   handleTap = (event) => {
     const aTag = event.target.closest('a');
-    const dataNetworkAttribute = event.target.closest('.yotpo-icon-btn');
 
     if (aTag && aTag.attributes.href && !aTag.classList.contains('yotpo-icon')) {
       event.preventDefault();
       const href = aTag.attributes.href.value;
-      this.props.navigate(href);
-    }
-
-    if (dataNetworkAttribute && dataNetworkAttribute.attributes['data-network']) {
-      const dataNetwork = dataNetworkAttribute.attributes['data-network'].value;
-      const linkedinHref = `https://www.linkedin.com/shareArticle?mini=true&url=${this.props.product.productUrl}`;
-      const twitterHref = `http://www.twitter.com/share?url=${this.props.product.productUrl}`;
-      const facebookHref = `https://www.facebook.com/sharer/sharer.php?u=#${this.props.product.productUrl}`;
-      switch (dataNetwork) {
-        case 'linkedin':
-          event.preventDefault();
-          this.props.navigate(linkedinHref);
-          break;
-        case 'twitter':
-          event.preventDefault();
-          this.props.navigate(twitterHref);
-          break;
-        case 'facebook':
-          event.preventDefault();
-          this.props.navigate(facebookHref);
-          break;
-        default:
-          break;
-      }
+      this.props.openPageExtern(href);
     }
   };
+
   /**
    * @returns {JSX}
    */

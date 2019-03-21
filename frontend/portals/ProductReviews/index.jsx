@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RouteContext } from '@shopgate/pwa-common/context';
 import { hex2bin } from '@shopgate/pwa-common/helpers/data';
-import HtmlReferenceContainer from '../../components/htmlReferenceContainer';
+import HtmlReferenceContainer from '../../components/HtmlReferenceContainer';
 import getConfig from '../../helpers/getConfig';
 import connect from './connector';
 
@@ -11,25 +11,25 @@ const config = getConfig();
 const HtmlReferenceContainerContext = connect(({
   productId,
   product,
-  navigate,
+  openPageExtern,
 }) => (
   <HtmlReferenceContainer
     config={config}
     productId={productId}
     product={product}
-    navigate={navigate}
+    openPageExtern={openPageExtern}
   />
 ));
 
 HtmlReferenceContainerContext.propTypes = {
   config: PropTypes.shape().isRequired,
   productId: PropTypes.string.isRequired,
-  navigate: PropTypes.func,
+  openPageExtern: PropTypes.func,
   productUrl: PropTypes.string,
 };
 
 HtmlReferenceContainerContext.defaultProps = {
-  navigate: () => {},
+  openPageExtern: () => {},
   productUrl: null,
 };
 

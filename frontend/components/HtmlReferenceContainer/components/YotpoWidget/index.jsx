@@ -44,23 +44,6 @@ class YotpoScript extends Component {
   }
 
   /**
-   * Update for yotpo fetching for different variant
-   * @param {Object} prevProps prevProps
-   */
-  componentDidUpdate(prevProps) {
-    if (this.props.productId !== prevProps.productId) {
-      window.yotpo.initialized = false;
-      window.yotpo.clean();
-      // 1500 Additional ms to account for refresh of widget properties and fetching of new widget.
-      this.yotpoRefreshTimeout = setTimeout(() => {
-        window.yotpo.refreshWidgets();
-        window.yotpo.initWidgets();
-        this.yotpoRefreshTimeout = undefined;
-      }, 2000);
-    }
-  }
-
-  /**
    * Cleanup timeout request
    */
   componentWillUnmount() {

@@ -11,6 +11,9 @@ const container = css({
   maxWidth: '100%',
   wordWrap: 'break-word',
   wordBreak: 'bread-word',
+  ' .socialize-wrapper': {
+    display: 'none !important',
+  },
 }).toString();
 
 export default {

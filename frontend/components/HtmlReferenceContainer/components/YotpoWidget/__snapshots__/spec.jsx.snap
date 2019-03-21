@@ -40,7 +40,7 @@ exports[`<YotpoWidget /> should render yotpo divs when a product is passed 1`] =
       data-url="wwww.123.com"
     />
     <div
-      className="yotpo yotpo-main-widget css-1yfwcul css-1gv7y8"
+      className="yotpo yotpo-main-widget css-1ys1n2d css-1gv7y8"
       data-description=""
       data-image-url="www.123456.com"
       data-name="item"
