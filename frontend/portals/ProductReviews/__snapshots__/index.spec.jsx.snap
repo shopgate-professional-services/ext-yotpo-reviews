@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProductReviews should render 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Connect(ProductReviews)>
+    <ProductReviews
+      openPageExtern={[Function]}
+      product={null}
+    >
+      <Connect(Component)
+        config={
+          Object {
+            "yotpoAppKey": "LHgQXH7Uj3KgqA8WkfUEfwsf9gMzKi3acoVoU8on",
+          }
+        }
+        openPageExtern={[Function]}
+        productId={false}
+        productUrl={null}
+      >
+        <Component
+          config={
+            Object {
+              "yotpoAppKey": "LHgQXH7Uj3KgqA8WkfUEfwsf9gMzKi3acoVoU8on",
+            }
+          }
+          openPageExtern={[Function]}
+          product={null}
+          productId={false}
+          productUrl={null}
+        >
+          <Component
+            config={
+              Object {
+                "yotpoAppKey": "LHgQXH7Uj3KgqA8WkfUEfwsf9gMzKi3acoVoU8on",
+              }
+            }
+            openPageExtern={[Function]}
+            product={null}
+            productId={false}
+          >
+            <div>
+              HtmlReferenceContainer
+            </div>
+          </Component>
+        </Component>
+      </Connect(Component)>
+    </ProductReviews>
+  </Connect(ProductReviews)>
+</Provider>
+`;
