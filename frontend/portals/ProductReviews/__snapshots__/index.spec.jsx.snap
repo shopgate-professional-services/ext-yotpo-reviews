@@ -20,7 +20,7 @@ exports[`ProductReviews should render 1`] = `
       openPageExtern={[Function]}
       product={
         Object {
-          "id": "product_one",
+          "productId": "product_one",
         }
       }
       productId="product_one"
@@ -44,7 +44,7 @@ exports[`ProductReviews should render 1`] = `
           openPageExtern={[Function]}
           product={
             Object {
-              "id": "product_one",
+              "productId": "product_one",
             }
           }
           productId={false}
@@ -59,7 +59,7 @@ exports[`ProductReviews should render 1`] = `
             openPageExtern={[Function]}
             product={
               Object {
-                "id": "product_one",
+                "productId": "product_one",
               }
             }
             productId={false}

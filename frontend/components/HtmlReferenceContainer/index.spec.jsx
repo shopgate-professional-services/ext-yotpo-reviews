@@ -14,7 +14,7 @@ describe('HtmlReferenceContainer', () => {
     const component = mount((
       <Provider store={store}>
         <HtmlReferenceContainer
-          config={{}}
+          config={{ yotpoAppKey: 'mock' }}
           productId="product_one"
         />
       </Provider>

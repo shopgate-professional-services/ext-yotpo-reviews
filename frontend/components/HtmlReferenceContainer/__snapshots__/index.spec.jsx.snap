@@ -13,14 +13,22 @@ exports[`HtmlReferenceContainer should render HtmlReferenceContainer 1`] = `
   }
 >
   <HtmlReferenceContainer
-    config={Object {}}
+    config={
+      Object {
+        "yotpoAppKey": "mock",
+      }
+    }
     openPageExtern={[Function]}
     product={Object {}}
     productId="product_one"
   >
     <div>
       <Component
-        config={Object {}}
+        config={
+          Object {
+            "yotpoAppKey": "mock",
+          }
+        }
         product={Object {}}
         productId="product_one"
       >
