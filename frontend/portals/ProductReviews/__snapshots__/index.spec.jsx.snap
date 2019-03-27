@@ -13,10 +13,17 @@ exports[`ProductReviews should render 1`] = `
     }
   }
 >
-  <Connect(ProductReviews)>
+  <Connect(ProductReviews)
+    productId="product_one"
+  >
     <ProductReviews
       openPageExtern={[Function]}
-      product={null}
+      product={
+        Object {
+          "id": "product_one",
+        }
+      }
+      productId="product_one"
     >
       <Connect(Component)
         config={
@@ -35,7 +42,11 @@ exports[`ProductReviews should render 1`] = `
             }
           }
           openPageExtern={[Function]}
-          product={null}
+          product={
+            Object {
+              "id": "product_one",
+            }
+          }
           productId={false}
           productUrl={null}
         >
@@ -46,7 +57,11 @@ exports[`ProductReviews should render 1`] = `
               }
             }
             openPageExtern={[Function]}
-            product={null}
+            product={
+              Object {
+                "id": "product_one",
+              }
+            }
             productId={false}
           >
             <div>

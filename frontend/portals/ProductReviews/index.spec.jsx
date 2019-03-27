@@ -8,6 +8,9 @@ import { RouteContext } from '@shopgate/pwa-common/context';
 import ProductReviews from './index';
 
 const mockedStore = configureStore();
+jest.mock('@shopgate/pwa-common-commerce/product/selectors/product', () => ({
+  getProduct: jest.fn().mockReturnValue({ productId: 'product_one' }),
+}));
 jest.mock('../../components/HtmlReferenceContainer', () => () => (<div>HtmlReferenceContainer</div>));
 
 /**
@@ -17,7 +20,7 @@ jest.mock('../../components/HtmlReferenceContainer', () => () => (<div>HtmlRefer
 const createComponent = () => mount(
   <RouteContext.Provider value={{ params: { product: 'product_one' } }}>
     <Provider store={mockedStore({ product: basicProductState })}>
-      <ProductReviews />
+      <ProductReviews productId="product_one" />
     </Provider>
   </RouteContext.Provider>,
   mockRenderOptions

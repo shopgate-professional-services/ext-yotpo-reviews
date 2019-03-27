@@ -24,7 +24,6 @@ class YotpoScript extends Component {
   constructor(props) {
     super(props);
     this.yotpoMountTimeout = undefined;
-    this.yotpoRefreshTimeout = undefined;
   }
 
   /**
@@ -47,12 +46,7 @@ class YotpoScript extends Component {
    * Cleanup timeout request
    */
   componentWillUnmount() {
-    if (this.yotpoMountTimeout) {
-      clearTimeout(this.yotpoMountTimeout);
-    }
-    if (this.yotpoRefreshTimeout) {
-      clearTimeout(this.yotpoRefreshTimeout);
-    }
+    clearTimeout(this.yotpoMountTimeout);
   }
 
   /**
