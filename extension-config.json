@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "id": "@shopgate-project/yotpo-reviews",
+  "components": [
+    {
+      "id": "pdpYotpoScript",
+      "path": "frontend/portals/ProductReviews",
+      "target": "product.reviews",
+      "type": "portals"
+    }
+  ],
+  "configuration": {
+    "yotpoAppKey": {
+      "type": "admin",
+      "destination": "frontend",
+      "default": null,
+      "params": {
+        "required": true,
+        "type": "string",
+        "label": "Yotpo App Key"
+      }
+    }
+  }
+}

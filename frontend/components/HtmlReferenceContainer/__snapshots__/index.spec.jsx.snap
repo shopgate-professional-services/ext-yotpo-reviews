@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HtmlReferenceContainer should render HtmlReferenceContainer 1`] = `
+<Provider
+  store={
+    Object {
+      "dispatch": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+      Symbol(observable): [Function],
+    }
+  }
+>
+  <HtmlReferenceContainer
+    config={
+      Object {
+        "yotpoAppKey": "mock",
+      }
+    }
+    openPageExtern={[Function]}
+    product={Object {}}
+    productId="product_one"
+  >
+    <div>
+      <Component
+        config={
+          Object {
+            "yotpoAppKey": "mock",
+          }
+        }
+        product={Object {}}
+        productId="product_one"
+      >
+        <div>
+          YotpoWidget
+        </div>
+      </Component>
+    </div>
+  </HtmlReferenceContainer>
+</Provider>
+`;
