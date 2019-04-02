@@ -1,6 +1,6 @@
 {
   "name": "@shopgate-ps/yotpo-reviews",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Allows customers to leave and read yotpo reviews for merchant's products",
   "license": "Apache-2.0",
   "scripts": {
