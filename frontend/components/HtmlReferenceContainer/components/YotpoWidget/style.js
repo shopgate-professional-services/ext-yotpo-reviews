@@ -10,9 +10,12 @@ const padding = css({
 const container = css({
   maxWidth: '100%',
   wordWrap: 'break-word',
-  wordBreak: 'bread-word',
-  ' .socialize-wrapper': {
+  wordBreak: 'break-word',
+  '.socialize-wrapper, .yotpo-icon-three-lines, .yotpo-bottomline-empty-state': {
     display: 'none !important',
+  },
+  ' .yotpo-menu-mobile-collapse': {
+    display: 'block !important',
   },
 }).toString();
 
