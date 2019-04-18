@@ -11,7 +11,7 @@ const container = css({
   maxWidth: '100%',
   wordWrap: 'break-word',
   wordBreak: 'break-word',
-  '.socialize-wrapper, .yotpo-icon-three-lines, .yotpo-bottomline-empty-state': {
+  ' .socialize-wrapper, .yotpo-icon-three-lines, .yotpo-bottomline-empty-state': {
     display: 'none !important',
   },
   ' .yotpo-menu-mobile-collapse': {

@@ -9,7 +9,7 @@ Add the yotpo-reviews extension to your Shopgate Connect deployment config.
 (...)
   {
     "id": "@shopgate-project/yotpo-reviews",
-    "version": "1.0.2"
+    "version": "1.0.3"
   }
 (...)
 ```
