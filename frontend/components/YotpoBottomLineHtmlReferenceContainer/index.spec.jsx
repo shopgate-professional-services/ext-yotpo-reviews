@@ -2,10 +2,10 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { createMockStore } from '@shopgate/pwa-common/store';
 import { Provider } from 'react-redux';
-import YotpoWidget from './components/YotpoWidget';
+import YotpoBottomLineWidget from './components/YotpoBottomLineWidget';
 import HtmlReferenceContainer from './index';
 
-jest.mock('./components/YotpoWidget', () => () => (<div>YotpoWidget</div>));
+jest.mock('./components/YotpoBottomLineWidget', () => () => (<div>YotpoBottomLineWidget</div>));
 
 const store = createMockStore();
 
@@ -20,6 +20,6 @@ describe('HtmlReferenceContainer', () => {
       </Provider>
     ));
     expect(component).toMatchSnapshot();
-    expect(component.find(YotpoWidget).length).toBe(1);
+    expect(component.find(YotpoBottomLineWidget).length).toBe(1);
   });
 });

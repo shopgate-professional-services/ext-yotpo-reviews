@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ProductReviews should render 1`] = `
+exports[`ProductInfoAfter should render 1`] = `
 <Provider
   store={
     Object {
@@ -13,10 +13,10 @@ exports[`ProductReviews should render 1`] = `
     }
   }
 >
-  <Connect(ProductReviews)
+  <Connect(ProductInfoAfter)
     productId="product_one"
   >
-    <ProductReviews
+    <ProductInfoAfter
       openPageExtern={[Function]}
       product={
         Object {
@@ -56,7 +56,6 @@ exports[`ProductReviews should render 1`] = `
                 "yotpoAppKey": "Jef9OB604CTlOdKzDGy4J9VohHwktePlzRaEEO1w",
               }
             }
-            openPageExtern={[Function]}
             product={
               Object {
                 "productId": "product_one",
@@ -70,7 +69,7 @@ exports[`ProductReviews should render 1`] = `
           </Component>
         </Component>
       </Connect(Component)>
-    </ProductReviews>
-  </Connect(ProductReviews)>
+    </ProductInfoAfter>
+  </Connect(ProductInfoAfter)>
 </Provider>
 `;
