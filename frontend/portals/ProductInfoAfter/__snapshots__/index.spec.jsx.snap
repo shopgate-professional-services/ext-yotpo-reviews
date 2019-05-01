@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ProductReviews should render 1`] = `
+exports[`ProductInfoAfter should render 1`] = `
 <Provider
   store={
     Object {
@@ -13,10 +13,10 @@ exports[`ProductReviews should render 1`] = `
     }
   }
 >
-  <Connect(ProductReviews)
+  <Connect(ProductInfoAfter)
     productId="product_one"
   >
-    <ProductReviews
+    <ProductInfoAfter
       openPageExtern={[Function]}
       product={
         Object {
@@ -25,6 +25,6 @@ exports[`ProductReviews should render 1`] = `
       }
       productId="product_one"
     />
-  </Connect(ProductReviews)>
+  </Connect(ProductInfoAfter)>
 </Provider>
 `;

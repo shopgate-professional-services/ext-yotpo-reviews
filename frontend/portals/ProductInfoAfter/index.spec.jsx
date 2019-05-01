@@ -11,9 +11,8 @@ const mockedStore = configureStore();
 jest.mock('@shopgate/pwa-common-commerce/product/selectors/product', () => ({
   getProduct: jest.fn().mockReturnValue({ productId: 'product_one' }),
 }));
-jest.mock('../../components/YotpoMainHtmlReferenceContainer', () => () => (<div>HtmlReferenceContainer</div>));
+jest.mock('../../components/YotpoBottomLineHtmlReferenceContainer', () => () => (<div>HtmlReferenceContainer</div>));
 jest.mock('../../helpers/getConfig.js', () => () => ({ yotpoApiKey: 'mock' }));
-
 /**
  * Create Component
  * @return {ReactWrapper}
@@ -27,7 +26,7 @@ const createComponent = () => mount(
   mockRenderOptions
 );
 
-describe('ProductReviews', () => {
+describe('ProductInfoAfter', () => {
   it('should render', () => {
     const component = createComponent();
     expect(component).toMatchSnapshot();

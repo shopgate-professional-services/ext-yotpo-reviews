@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import YotpoWidget from './components/YotpoWidget';
+import YotpoWidget from './components/YotpoMainWidget';
 
 /**
  * Creates Reference to acces DOM nodes

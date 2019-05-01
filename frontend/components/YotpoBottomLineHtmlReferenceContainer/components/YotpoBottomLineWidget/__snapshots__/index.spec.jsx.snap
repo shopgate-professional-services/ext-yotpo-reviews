@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<YotpoBottomLineWidget /> should not render if there is product props 1`] = `
+<YotpoBottomLineWidget
+  config={
+    Object {
+      "yotpoAppKey": null,
+    }
+  }
+  product={null}
+  productId="2"
+/>
+`;
+
+exports[`<YotpoBottomLineWidget /> should render yotpo divs when a product is passed 1`] = `
+<YotpoBottomLineWidget
+  config={
+    Object {
+      "yotpoAppKey": null,
+    }
+  }
+  product={
+    Object {
+      "featuredImageUrl": "www.123456.com",
+      "name": "item",
+      "productUrl": "wwww.123.com",
+    }
+  }
+  productId="2"
+>
+  <div
+    className="yotpo bottomLine"
+    data-appkey="null"
+    data-description=""
+    data-domain=""
+    data-image-url="www.123456.com"
+    data-name="item"
+    data-product-id="2"
+    data-url="wwww.123.com"
+  />
+</YotpoBottomLineWidget>
+`;

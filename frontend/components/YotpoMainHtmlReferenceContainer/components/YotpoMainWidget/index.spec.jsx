@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import YotpoWidget from './index';
+import YotpoMainWidget from './index';
 import getYotpo from '../../../../helpers/getYotpo';
 
 jest.mock('../../../../helpers/getYotpo');
@@ -10,10 +10,10 @@ const product = {
   productUrl: 'wwww.123.com',
   featuredImageUrl: 'www.123456.com',
 };
-describe('<YotpoWidget />', () => {
+describe('<YotpoMainWidget />', () => {
   it('should not render if there is product props', () => {
     const wrapper = mount((
-      <YotpoWidget product={noProduct} config={{ yotpoAppKey: null }} productId="2" />
+      <YotpoMainWidget product={noProduct} config={{ yotpoAppKey: null }} productId="2" />
     ));
 
     expect(wrapper).toMatchSnapshot();
@@ -21,7 +21,7 @@ describe('<YotpoWidget />', () => {
   });
   it('should render yotpo divs when a product is passed', () => {
     const wrapper = mount((
-      <YotpoWidget product={product} config={{ yotpoAppKey: null }} productId="2" />
+      <YotpoMainWidget product={product} config={{ yotpoAppKey: null }} productId="2" />
     ));
 
     expect(wrapper).toMatchSnapshot();
@@ -29,7 +29,7 @@ describe('<YotpoWidget />', () => {
   });
   it('should call mountScript if no window.yotpo', () => {
     const wrapper = mount((
-      <YotpoWidget product={product} config={{ yotpoAppKey: null }} productId="2" />
+      <YotpoMainWidget product={product} config={{ yotpoAppKey: null }} productId="2" />
     ));
     const renderedInstance = wrapper.instance();
     renderedInstance.componentDidMount();
@@ -43,7 +43,7 @@ describe('<YotpoWidget />', () => {
       refreshWidgets: jest.fn(),
     };
     const wrapper = mount((
-      <YotpoWidget product={product} config={{ yotpoAppKey: null }} productId="2" />
+      <YotpoMainWidget product={product} config={{ yotpoAppKey: null }} productId="2" />
     ));
     const renderedInstance = wrapper.instance();
     renderedInstance.componentDidMount();

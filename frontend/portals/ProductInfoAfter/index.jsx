@@ -2,49 +2,47 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RouteContext } from '@shopgate/pwa-common/context';
 import { hex2bin } from '@shopgate/pwa-common/helpers/data';
-import YotpoMainHtmlReferenceContainer from '../../components/YotpoMainHtmlReferenceContainer';
+import YotpoBottomLineHtmlReferenceContainer from '../../components/YotpoBottomLineHtmlReferenceContainer';
 import getConfig from '../../helpers/getConfig';
 import connect from '../connector';
 
 const config = getConfig();
 
-const HtmlReferenceContainerContext = connect(({
+const YotpoBottomLineContainer = connect(({
   productId,
   product,
-  openPageExtern,
 }) => (
-  <YotpoMainHtmlReferenceContainer
+  <YotpoBottomLineHtmlReferenceContainer
     config={config}
     productId={productId}
     product={product}
-    openPageExtern={openPageExtern}
   />
 ));
 
-HtmlReferenceContainerContext.propTypes = {
+YotpoBottomLineContainer.propTypes = {
   config: PropTypes.shape().isRequired,
   productId: PropTypes.string.isRequired,
   openPageExtern: PropTypes.func,
   productUrl: PropTypes.string,
 };
 
-HtmlReferenceContainerContext.defaultProps = {
+YotpoBottomLineContainer.defaultProps = {
   openPageExtern: () => {},
   productUrl: null,
 };
 
 /**
- * Renders YotpoWidget component in product.reviews portal
+ * Renders YotpoBottomLine component in product.info.after portal
  * @returns {JSX}
  */
-const ProductReviews = () => {
+const ProductInfoAfter = () => {
   if (!config.yotpoAppKey) {
     return null;
   }
   return (
     <RouteContext.Consumer>
       {({ params }) => (
-        <HtmlReferenceContainerContext
+        <YotpoBottomLineContainer
           productId={hex2bin(params.productId)}
           config={config}
         />
@@ -53,4 +51,4 @@ const ProductReviews = () => {
   );
 };
 
-export default connect(ProductReviews);
+export default connect(ProductInfoAfter);
