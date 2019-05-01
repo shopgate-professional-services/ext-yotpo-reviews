@@ -12,7 +12,7 @@ jest.mock('@shopgate/pwa-common-commerce/product/selectors/product', () => ({
   getProduct: jest.fn().mockReturnValue({ productId: 'product_one' }),
 }));
 jest.mock('../../components/YotpoBottomLineHtmlReferenceContainer', () => () => (<div>HtmlReferenceContainer</div>));
-
+jest.mock('../../helpers/getConfig.js', () => () => ({ yotpoApiKey: 'mock' }));
 /**
  * Create Component
  * @return {ReactWrapper}

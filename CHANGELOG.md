@@ -5,6 +5,7 @@
 ## [1.1.0] - 2019-04-30
 - Added style rule to hide yotpo product slider
 - Added aggregated star review in product header with scroll to functionality
+- Updated potential bug to refresh widgets on unmounting.
 
 ## [1.0.3] - 2019-03-21
 Fixed a typo.

@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0-rc.2",
+  "version": "1.1.0-",
   "id": "@shopgate-project/yotpo-reviews",
   "components": [
     {
@@ -9,7 +9,7 @@
       "type": "portals"
     },
     {
-      "id": "ProductInfoAfterPotal",
+      "id": "ProductInfoAfterPortal",
       "path": "frontend/portals/ProductInfoAfter",
       "target": "product.info.after",
       "type": "portals"

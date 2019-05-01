@@ -24,53 +24,7 @@ exports[`ProductReviews should render 1`] = `
         }
       }
       productId="product_one"
-    >
-      <Connect(Component)
-        config={
-          Object {
-            "yotpoAppKey": "Jef9OB604CTlOdKzDGy4J9VohHwktePlzRaEEO1w",
-          }
-        }
-        openPageExtern={[Function]}
-        productId={false}
-        productUrl={null}
-      >
-        <Component
-          config={
-            Object {
-              "yotpoAppKey": "Jef9OB604CTlOdKzDGy4J9VohHwktePlzRaEEO1w",
-            }
-          }
-          openPageExtern={[Function]}
-          product={
-            Object {
-              "productId": "product_one",
-            }
-          }
-          productId={false}
-          productUrl={null}
-        >
-          <Component
-            config={
-              Object {
-                "yotpoAppKey": "Jef9OB604CTlOdKzDGy4J9VohHwktePlzRaEEO1w",
-              }
-            }
-            openPageExtern={[Function]}
-            product={
-              Object {
-                "productId": "product_one",
-              }
-            }
-            productId={false}
-          >
-            <div>
-              HtmlReferenceContainer
-            </div>
-          </Component>
-        </Component>
-      </Connect(Component)>
-    </ProductReviews>
+    />
   </Connect(ProductReviews)>
 </Provider>
 `;

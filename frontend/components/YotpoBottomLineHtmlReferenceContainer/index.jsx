@@ -53,9 +53,7 @@ class HtmlReferenceContainer extends Component {
    */
   handleTap = (event) => {
     event.stopPropagation();
-    const aTag = event.target.closest('a') || null;
-    const divTag = event.target.closest('div') || null;
-    const spanTag = event.target.closest('span') || null;
+    event.preventDefault();
     /**
      * will scroll to yotpo reviews section
      */
@@ -75,12 +73,7 @@ class HtmlReferenceContainer extends Component {
         .closest('article')
         .scroll(0, reviewsExcerpt.offsetTop - 120);
     };
-    if ((aTag && aTag.classList.contains('text-m'))
-          || (divTag && (divTag.classList.contains('yotpo-bottomline') || (divTag.classList.contains('standalone-bottomline'))))
-          || (spanTag && (spanTag.classList.contains('yotpo-icon') || spanTag.classList.contains('yotpo-display-wrapper')))) {
-      event.preventDefault();
-      scrollToReviews();
-    }
+    scrollToReviews();
   };
 
   /**
