@@ -19,7 +19,7 @@ class YotpoMainWidget extends Component {
 
   /**
    * Constructs
-   * @param {Objects} props props
+   * @param {Object} props props
    */
   constructor(props) {
     super(props);
