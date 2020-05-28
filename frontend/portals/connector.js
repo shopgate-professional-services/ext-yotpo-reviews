@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { getProduct } from '@shopgate/pwa-common-commerce/product/selectors/product';
+import { getBaseProduct } from '@shopgate/pwa-common-commerce/product/selectors/product';
 import openPageExtern from '@shopgate/pwa-core/commands/openPageExtern';
 
 /**
@@ -9,7 +9,7 @@ import openPageExtern from '@shopgate/pwa-core/commands/openPageExtern';
  * @returns {Object} The extended component props.
  */
 const mapStateToProps = (state, props) => ({
-  product: getProduct(state, props),
+  product: getBaseProduct(state, props),
 });
 
 /**
