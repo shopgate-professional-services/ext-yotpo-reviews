@@ -34,7 +34,6 @@ class HtmlReferenceContainer extends Component {
     if (!this.props.config.yotpoAppKey) {
       return;
     }
-    this.htmlContainer.current.addEventListener('touchstart', this.handleTap, true);
     this.htmlContainer.current.addEventListener('click', this.handleTap, true);
   }
 
@@ -45,7 +44,6 @@ class HtmlReferenceContainer extends Component {
     if (!this.props.config.yotpoAppKey) {
       return;
     }
-    this.htmlContainer.current.removeEventListener('touchstart', this.handleTap, true);
     this.htmlContainer.current.removeEventListener('click', this.handleTap, true);
   }
 
