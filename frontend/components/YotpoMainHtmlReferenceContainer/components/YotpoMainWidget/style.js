@@ -17,6 +17,9 @@ const container = css({
   ' .yotpo-menu-mobile-collapse': {
     display: 'block !important',
   },
+  ' .avg-score': {
+    fontSize: '36px !important',
+  },
 }).toString();
 
 export default {
