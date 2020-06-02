@@ -2,6 +2,9 @@
  All notable changes to this project will be documented in this file.
  The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.3] - 2020-05-28
+- Fixed: font sizing for avg-score class
+
 ## [1.1.2] - 2020-05-28
 - Fixed: removed toustart listener to prevent unwanted scrolling
 
