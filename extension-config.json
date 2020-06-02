@@ -13,12 +13,6 @@
       "path": "frontend/portals/ProductInfoAfter",
       "target": "product.info.after",
       "type": "portals"
-    },
-    {
-      "type": "portals",
-      "target": "app.globals",
-      "path": "frontend/portals/GlobalCssRules",
-      "id": "GlobalCssRules"
     }
   ],
   "configuration": {
