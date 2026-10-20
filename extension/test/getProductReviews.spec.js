@@ -4,11 +4,10 @@
 const getProductReviews = require('../lib/reviews/getProductReviews')
 const { createContext, ok, row, rows, BOTTOMLINE } = require('./helpers')
 
-const REVIEWS_URI = 'https://api-cdn.yotpo.com/v1/widget/app_key/products/123/reviews.json'
-const FILTER_URI = 'https://api-cdn.yotpo.com/v1/reviews/app_key/filter.json'
+const REVIEWS_URI = 'https://api-cdn.yotpo.com/v3/storefront/store/app_key/product/123/reviews'
 
 /**
- * Answers like Yotpo: pages of `per_page` reviews out of `list`, with a bottomline on reviews.json.
+ * Answers like Yotpo V3: pages of `perPage` reviews out of `list`, with a bottomline on GET.
  * @param {Object[]} list All reviews of the product.
  * @param {Object} [options] `total` overrides the count.
  * @returns {Function} The request handler.
@@ -16,14 +15,11 @@ const FILTER_URI = 'https://api-cdn.yotpo.com/v1/reviews/app_key/filter.json'
 function yotpo (list, { total = list.length } = {}) {
   return (options) => {
     const page = options.qs.page
-    const perPage = options.qs.per_page
+    const perPage = options.qs.perPage
     const response = {
-      pagination: { page, per_page: perPage, total },
+      pagination: { page, perPage, total },
+      ...(options.method === 'GET' && { bottomline: BOTTOMLINE }),
       reviews: list.slice((page - 1) * perPage, page * perPage)
-    }
-
-    if (options.uri === REVIEWS_URI) {
-      response.bottomline = BOTTOMLINE
     }
 
     return ok(response)
@@ -32,7 +28,7 @@ function yotpo (list, { total = list.length } = {}) {
 
 describe('getProductReviews', () => {
   describe('endpoint', () => {
-    it('reads an unfiltered list from reviews.json with the base product id', async () => {
+    it('reads an unfiltered list with GET and the base product id', async () => {
       const context = createContext(yotpo(rows(3)))
 
       await getProductReviews(context, { productId: '123-variant', baseProductId: '123', limit: 2 })
@@ -41,7 +37,7 @@ describe('getProductReviews', () => {
       expect(context.requests[0]).toMatchObject({
         method: 'GET',
         uri: REVIEWS_URI,
-        qs: { page: 1, per_page: 2 },
+        qs: { page: 1, perPage: 2 },
         headers: { accept: 'application/json' },
         timeout: 8000
       })
@@ -56,15 +52,15 @@ describe('getProductReviews', () => {
     })
 
     it.each([
-      ['a star filter', { filterRate: 3 }, { domain_key: '123', scores: [3] }],
-      ['the media filter', { filterMedia: true }, { domain_key: '123', pictured: true }],
-      ['both filters', { filterRate: 5, filterMedia: true }, { domain_key: '123', scores: [5], pictured: true }]
-    ])('reads a list with %s from filter.json', async (_, filters, body) => {
+      ['a star filter', { filterRate: 3 }, { scores: [3] }],
+      ['the media filter', { filterMedia: true }, { pictured: true }],
+      ['both filters', { filterRate: 5, filterMedia: true }, { scores: [5], pictured: true }]
+    ])('reads a list with %s with POST and the filters as body', async (_, filters, body) => {
       const context = createContext(yotpo(rows(3)))
 
       const result = await getProductReviews(context, { productId: '123', limit: 10, ...filters })
 
-      expect(context.requests[0]).toMatchObject({ method: 'POST', uri: FILTER_URI, qs: { page: 1, per_page: 10 } })
+      expect(context.requests[0]).toMatchObject({ method: 'POST', uri: REVIEWS_URI, qs: { page: 1, perPage: 10 } })
       expect(context.requests[0].json).toEqual(body)
       expect(result.ratingSummary).toBeUndefined()
     })
@@ -80,7 +76,7 @@ describe('getProductReviews', () => {
 
       await getProductReviews(context, { productId: '123', ...filters })
 
-      expect(context.requests[0].uri).toBe(REVIEWS_URI)
+      expect(context.requests[0]).toMatchObject({ method: 'GET', uri: REVIEWS_URI, json: true })
     })
 
     it('URL-encodes the app key', async () => {
@@ -88,7 +84,7 @@ describe('getProductReviews', () => {
 
       await getProductReviews(context, { productId: 'X_y-1' })
 
-      expect(context.requests[0].uri).toBe('https://api-cdn.yotpo.com/v1/widget/a%2Fb/products/X_y-1/reviews.json')
+      expect(context.requests[0].uri).toBe('https://api-cdn.yotpo.com/v3/storefront/store/a%2Fb/product/X_y-1/reviews')
     })
 
     it.each([['..'], ['a/b'], ['x y'], [''], [undefined]])('answers %p without a request, as Yotpo cannot store it', async (productId) => {
@@ -109,31 +105,29 @@ describe('getProductReviews', () => {
 
   describe('sort', () => {
     it.each([
-      ['dateDesc', { sort: 'date', direction: 'desc' }, { sort_by: 'date', ascending: false }],
-      ['dateAsc', { sort: 'date', direction: 'asc' }, { sort_by: 'date', ascending: true }],
-      ['rateDesc', { sort: 'rating', direction: 'desc' }, { sort_by: 'score', ascending: false }],
-      ['rateAsc', { sort: 'rating', direction: 'asc' }, { sort_by: 'score', ascending: true }],
-      ['helpfulDesc', { sort: 'votes_up', direction: 'desc' }, { sort_by: 'votes_up', ascending: false }]
-    ])('maps %s on both endpoints', async (sort, query, sorting) => {
+      ['relevance', { sort: 'smart' }],
+      ['dateDesc', { sort: 'date' }],
+      ['dateAsc', { sort: 'date', direction: 'asc' }],
+      ['rateDesc', { sort: 'rating' }],
+      ['rateAsc', { sort: 'rating', direction: 'asc' }],
+      ['helpfulDesc', { sort: 'votes_up' }]
+    ])('maps %s for GET and POST', async (sort, query) => {
       const unfiltered = createContext(yotpo([]))
       const filtered = createContext(yotpo([]))
 
       await getProductReviews(unfiltered, { productId: '123', sort })
       await getProductReviews(filtered, { productId: '123', sort, filterRate: 4 })
 
-      expect(unfiltered.requests[0].qs).toEqual({ page: 1, per_page: 10, ...query })
-      expect(filtered.requests[0].json.sortings).toEqual([sorting])
+      expect(unfiltered.requests[0].qs).toEqual({ page: 1, perPage: 10, ...query })
+      expect(filtered.requests[0].qs).toEqual({ page: 1, perPage: 10, ...query })
     })
 
-    it.each([['relevance'], [undefined], ['newest']])('sends no sort for %s', async (sort) => {
-      const unfiltered = createContext(yotpo([]))
-      const filtered = createContext(yotpo([]))
+    it.each([[undefined], ['newest']])('sends no sort for %p', async (sort) => {
+      const context = createContext(yotpo([]))
 
-      await getProductReviews(unfiltered, { productId: '123', sort })
-      await getProductReviews(filtered, { productId: '123', sort, filterMedia: true })
+      await getProductReviews(context, { productId: '123', sort })
 
-      expect(unfiltered.requests[0].qs).toEqual({ page: 1, per_page: 10 })
-      expect(filtered.requests[0].json).not.toHaveProperty('sortings')
+      expect(context.requests[0].qs).toEqual({ page: 1, perPage: 10 })
     })
   })
 
@@ -159,20 +153,20 @@ describe('getProductReviews', () => {
       const result = await getProductReviews(context, { productId: '123', offset: 9, limit: 10 })
 
       expect(context.requests.map(request => request.qs)).toEqual([
-        { page: 1, per_page: 10 },
-        { page: 2, per_page: 10 }
+        { page: 1, perPage: 10 },
+        { page: 2, perPage: 10 }
       ])
       expect(result.reviews.map(review => review.id)).toEqual(
         ['10', '11', '12', '13', '14', '15', '16', '17', '18', '19']
       )
     })
 
-    it('reads two filter.json pages for an unaligned filtered window', async () => {
+    it('reads two POST pages for an unaligned filtered window', async () => {
       const context = createContext(yotpo(rows(25)))
 
       const result = await getProductReviews(context, { productId: '123', offset: 3, limit: 10, filterRate: 5 })
 
-      expect(context.requests.map(request => [request.uri, request.qs.page])).toEqual([[FILTER_URI, 1], [FILTER_URI, 2]])
+      expect(context.requests.map(request => [request.method, request.qs.page])).toEqual([['POST', 1], ['POST', 2]])
       expect(result.reviews.map(review => review.id)).toEqual(['4', '5', '6', '7', '8', '9', '10', '11', '12', '13'])
       expect(result.ratingSummary).toBeUndefined()
     })
@@ -183,7 +177,7 @@ describe('getProductReviews', () => {
         call += 1
         return ok({
           pagination: { total: call === 1 ? 25 : 26 },
-          bottomline: call === 1 ? BOTTOMLINE : { ...BOTTOMLINE, total_review: 999 },
+          bottomline: call === 1 ? BOTTOMLINE : { ...BOTTOMLINE, totalReview: 999 },
           reviews: rows(10, (options.qs.page - 1) * 10 + 1)
         })
       })
@@ -208,7 +202,7 @@ describe('getProductReviews', () => {
 
       const result = await getProductReviews(context, { productId: '123', offset: -3, limit: 'x' })
 
-      expect(context.requests[0].qs).toEqual({ page: 1, per_page: 10 })
+      expect(context.requests[0].qs).toEqual({ page: 1, perPage: 10 })
       expect(result.reviews).toHaveLength(10)
     })
 
@@ -217,7 +211,7 @@ describe('getProductReviews', () => {
 
       await getProductReviews(context, { productId: '123', limit: 500 })
 
-      expect(context.requests[0].qs.per_page).toBe(150)
+      expect(context.requests[0].qs.perPage).toBe(150)
     })
 
     it('returns only the count for a limit of 0', async () => {
@@ -225,7 +219,7 @@ describe('getProductReviews', () => {
 
       const result = await getProductReviews(context, { productId: '123', offset: 7, limit: 0 })
 
-      expect(context.requests.map(request => request.qs)).toEqual([{ page: 1, per_page: 1 }])
+      expect(context.requests.map(request => request.qs)).toEqual([{ page: 1, perPage: 1 }])
       expect(result.reviews).toEqual([])
       expect(result.totalReviewCount).toBe(3)
     })
@@ -250,8 +244,8 @@ describe('getProductReviews', () => {
 
     it('counts 0 for an unknown product', async () => {
       const context = createContext(() => ok({
-        pagination: { page: 0, per_page: 10, total: 0 },
-        bottomline: { total_review: 0, average_score: 0.0, star_distribution: null },
+        pagination: { page: 0, perPage: 10, total: 0 },
+        bottomline: { totalReview: 0, averageScore: 0.0, starDistribution: null },
         reviews: []
       }))
 
@@ -265,7 +259,7 @@ describe('getProductReviews', () => {
     })
 
     it.each([
-      ['no response part', { status: { code: 200 } }],
+      ['no reviews', { status: { code: 200 } }],
       ['an HTML page', '<html>error</html>']
     ])('throws when Yotpo answers 200 with %s', async (_, body) => {
       const context = createContext(() => ({ statusCode: 200, body }))
@@ -325,7 +319,7 @@ describe('getProductReviews', () => {
       const continued = await getProductReviews(middle, { productId: '123', limit: 10, after: '10', filterRate: 5 })
       const ended = await getProductReviews(last, { productId: '123', limit: 10, after: '10', filterRate: 5 })
 
-      expect(middle.requests[0]).toMatchObject({ uri: FILTER_URI, qs: { page: 2, per_page: 10 } })
+      expect(middle.requests[0]).toMatchObject({ method: 'POST', uri: REVIEWS_URI, qs: { page: 2, perPage: 10 } })
       expect(continued.cursors).toEqual({ after: '20' })
       expect(ended.reviews).toHaveLength(5)
       expect(ended).not.toHaveProperty('cursors')
@@ -384,6 +378,15 @@ describe('getProductReviews', () => {
 
       expect(requests).toBe(3)
       expect(new Set(loaded).size).toBe(24)
+      expect(loaded).not.toContain('20')
+    })
+
+    it.each([[1e21], [1000000000]])('starts at the first page for the out-of-range offset %p', async (offset) => {
+      const context = createContext(yotpo(rows(25)))
+
+      await getProductReviews(context, { productId: '123', limit: 10, offset })
+
+      expect(context.requests[0].qs.page).toBe(1)
     })
 
     it.each([['abc'], ['-5'], ['1.5'], [12], ['9'.repeat(10)], ['9'.repeat(400)]])('ignores the invalid cursor %p', async (after) => {
@@ -415,7 +418,7 @@ describe('getProductReviews', () => {
     ])('rounds the average %f to one decimal star (%i)', async (averageScore, average) => {
       const context = createContext(() => ok({
         pagination: { total: 1 },
-        bottomline: { ...BOTTOMLINE, average_score: averageScore },
+        bottomline: { ...BOTTOMLINE, averageScore },
         reviews: []
       }))
 
@@ -427,7 +430,7 @@ describe('getProductReviews', () => {
     it('fills missing and invalid buckets with 0', async () => {
       const context = createContext(() => ok({
         pagination: { total: 3 },
-        bottomline: { total_review: 3, average_score: 4, star_distribution: { 5: 2, 4: '1', 1: -1 } },
+        bottomline: { totalReview: 3, averageScore: 4, starDistribution: { 5: 2, 4: '1', 1: -1 } },
         reviews: []
       }))
 
@@ -441,22 +444,24 @@ describe('getProductReviews', () => {
     it('maps every field', async () => {
       const context = createContext(yotpo([row(734839832, {
         score: 4,
-        votes_up: 3,
-        votes_down: 1,
+        votesUp: 3,
+        votesDown: 1,
         content: 'Tasty',
         title: 'Great syrup',
-        created_at: '2025-08-04T21:47:44.000Z',
-        verified_buyer: false,
-        user: { display_name: 'Kaleena G.' },
-        comment: { content: 'Thanks!', created_at: '2026-10-07T11:36:34', display_name: '' },
-        images_data: [
-          { id: 1, thumb_url: 'https://cdn/1/square.jpg', original_url: 'https://cdn/1/original.jpg' },
-          { id: 2, thumb_url: 'https://cdn/2/square.jpg' }
+        createdAt: '2025-08-04T21:47:44',
+        verifiedBuyer: false,
+        isShop: false,
+        user: { displayName: 'Kaleena G.' },
+        comment: { content: 'Thanks!', createdAt: '2026-10-07T11:36:34', displayName: '' },
+        imagesData: [
+          { id: 1, thumbUrl: 'https://cdn/1/square.jpg', originalUrl: 'https://cdn/1/original.jpg' },
+          { id: 2, thumbUrl: 'https://cdn/2/square.jpg' }
         ],
-        custom_fields: {
-          '--6688': { title: 'Flavor', value: ['Mango', 'Lime'], field_type: 'MultipleChoice' },
-          '--6689': { title: 'Sweetness', value: 4, field_type: 'Rating' },
-          '--6690': { title: 'Empty', value: '', field_type: 'CustomerFreeText' }
+        productVariants: { Size: '750 mL Glass Bottle' },
+        customFields: {
+          '--6688': { title: 'Flavor', formId: 1, value: ['Mango', 'Lime'], fieldType: 'MultipleChoice' },
+          '--6689': { title: 'Sweetness', formId: 1, value: 4, fieldType: 'Rating' },
+          '--6690': { title: 'Empty', formId: 1, value: '', fieldType: 'CustomerFreeText' }
         }
       })]))
 
@@ -466,7 +471,7 @@ describe('getProductReviews', () => {
         id: '734839832',
         rate: 80,
         author: 'Kaleena G.',
-        date: '2025-08-04T21:47:44.000Z',
+        date: '2025-08-04T21:47:44Z',
         title: 'Great syrup',
         review: 'Tasty',
         isVerified: false,
@@ -480,8 +485,41 @@ describe('getProductReviews', () => {
       }])
     })
 
+    it('maps a Shop app review without title', async () => {
+      const context = createContext(yotpo([row(890536950, {
+        title: null,
+        content: 'One of my favorite must haves!',
+        isShop: true,
+        user: { displayName: 'Bertha', userType: 'User' },
+        createdAt: '2026-09-14T08:16:15'
+      })]))
+
+      const { reviews: [review] } = await getProductReviews(context, { productId: '123' })
+
+      expect(review).toMatchObject({
+        id: '890536950',
+        title: '',
+        review: 'One of my favorite must haves!',
+        author: 'Bertha',
+        date: '2026-09-14T08:16:15Z'
+      })
+    })
+
+    it('maps custom fields delivered as an array', async () => {
+      const context = createContext(yotpo([row(1, {
+        customFields: [
+          { title: 'Flavor', fieldType: 'SingleChoice', value: 'Mango' },
+          { title: 'Note', fieldType: 'CustomerFreeText', value: null }
+        ]
+      })]))
+
+      const { reviews } = await getProductReviews(context, { productId: '123' })
+
+      expect(reviews[0].customFields).toEqual([{ label: 'Flavor', value: 'Mango' }])
+    })
+
     it('leaves out a verified flag that is no boolean and a missing date', async () => {
-      const context = createContext(yotpo([row(1, { verified_buyer: 'yes', created_at: '' })]))
+      const context = createContext(yotpo([row(1, { verifiedBuyer: 'yes', createdAt: '' })]))
 
       const { reviews } = await getProductReviews(context, { productId: '123' })
 
@@ -494,10 +532,11 @@ describe('getProductReviews', () => {
         id: 7,
         score: 5,
         content: 'Only text',
-        created_at: '2026-01-01T00:00:00.000Z',
-        user: { display_name: '' },
-        comment: { content: '  ', created_at: '2026-01-02T00:00:00' },
-        votes_up: 2
+        createdAt: '2026-01-01T00:00:00.000Z',
+        title: null,
+        user: { displayName: '' },
+        comment: { content: '  ', createdAt: '2026-01-02T00:00:00' },
+        votesUp: 2
       }]))
 
       const { reviews } = await getProductReviews(context, { productId: '123' })
@@ -514,7 +553,7 @@ describe('getProductReviews', () => {
 
     it('keeps a reply date with a zone and omits a missing one', async () => {
       const context = createContext(yotpo([
-        row(1, { comment: { content: 'A', created_at: '2026-10-07T11:36:34+02:00' } }),
+        row(1, { comment: { content: 'A', createdAt: '2026-10-07T11:36:34+02:00' } }),
         row(2, { comment: { content: 'B' } })
       ]))
 

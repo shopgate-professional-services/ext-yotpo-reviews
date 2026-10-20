@@ -21,8 +21,10 @@ Shopify product id). No secret key is needed; the app key is public.
 
 - Rating summary with average, number of reviews and star distribution on the product
   page and the reviews page.
-- Review list with load more, sorting (relevance = Yotpo's own order, newest, oldest,
-  best and worst rating, most helpful) and the filters "stars" and "with media".
+- Review list with load more, sorting (relevance = Yotpo's "Most relevant", newest,
+  oldest, best and worst rating, most helpful) and the filters "stars" and "with media".
+- The same reviews as Yotpo's widgets on the web shop, including reviews without title
+  from Shopify's Shop app.
 - Verified buyer badge, merchant reply, review images, custom fields and helpfulness
   votes (thumbs up / down).
 
@@ -34,9 +36,8 @@ Shopify product id). No secret key is needed; the app key is public.
 - No videos.
 - Custom fields are mapped but not verified with live data.
 - The merchant reply shows no author name (Yotpo sends none).
-- Yotpo delivers data with up to **3 hours delay**. A new review, a reply or a vote
-  appears in the app only after that. A vote first shows immediately on the device and
-  can drop back to the old count on a later reload.
+- A vote first shows immediately on the device and can drop back to the old count on a
+  later reload, until Yotpo counts it.
 - Yotpo has no protection against repeated votes; the app allows one vote per review and
   device.
 - Thumbnails load the original image.

@@ -17,7 +17,7 @@ describe('addProductReviewVote', () => {
     })
   })
 
-  it('accepts an answer without response part', async () => {
+  it('accepts any successful body', async () => {
     const context = createContext(() => ({ statusCode: 200, body: { status: { code: 200, message: 'OK' } } }))
 
     await expect(addProductReviewVote(context, { reviewId: '1', vote: 'up' })).resolves.toEqual({})

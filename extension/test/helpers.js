@@ -28,11 +28,11 @@ function createContext (handler, config) {
 }
 
 /**
- * @param {Object} response The `response` part of a Yotpo body.
+ * @param {Object} body A Yotpo V3 body.
  * @returns {Object} A successful Yotpo answer.
  */
-function ok (response) {
-  return { statusCode: 200, body: { status: { code: 200, message: 'OK' }, response } }
+function ok (body) {
+  return { statusCode: 200, body }
 }
 
 /**
@@ -45,17 +45,18 @@ function row (id, overrides) {
   return {
     id,
     score: 5,
-    votes_up: 0,
-    votes_down: 0,
+    votesUp: 0,
+    votesDown: 0,
     content: `Review ${id}`,
     title: `Title ${id}`,
-    created_at: '2026-10-04T12:00:00.000Z',
-    verified_buyer: true,
-    deleted: false,
-    custom_fields: null,
-    images_data: [],
+    createdAt: '2026-10-04T12:00:00',
+    verifiedBuyer: true,
+    isShop: false,
+    customFields: null,
+    imagesData: null,
+    videosData: null,
     comment: null,
-    user: { display_name: `Author ${id}`, user_type: 'User' },
+    user: { displayName: `Author ${id}`, userType: 'User' },
     ...overrides
   }
 }
@@ -70,9 +71,9 @@ function rows (count, start = 1) {
 }
 
 const BOTTOMLINE = {
-  total_review: 239,
-  average_score: 4.8953977,
-  star_distribution: { '1': 2, '2': 0, '3': 4, '4': 9, '5': 224 }
+  totalReview: 239,
+  averageScore: 4.8953977,
+  starDistribution: { '1': 2, '2': 0, '3': 4, '4': 9, '5': 224 }
 }
 
 module.exports = { createContext, ok, row, rows, BOTTOMLINE }

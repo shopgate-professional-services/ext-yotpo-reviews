@@ -8,20 +8,22 @@ const DEFAULT_LIMIT = 10
 const MAX_LIMIT = 150
 // Yotpo product ids allow only these characters; others could also alter the request path.
 const PRODUCT_ID_PATTERN = /^[A-Za-z0-9_-]+$/
-// Bounded so that a crafted cursor on the public pipeline stays a safe page number.
+// Bounded so that a crafted cursor or offset on the public pipeline stays a page number Yotpo
+// accepts; far larger positions make it answer 500.
 const CURSOR_PATTERN = /^\d{1,9}$/
+const MAX_POSITION = 999999999
 
-// Shopgate sort value to Yotpo sort field and direction. `relevance` and unknown values send
-// no sort, which gives Yotpo's own ranking.
+// Shopgate sort value to Yotpo's V3 `sort` and `direction`. `smart` is Yotpo's relevance
+// ranking ("Most relevant" in its widget); `votes_up` works although Yotpo does not document it.
+// Unknown values send no sort.
 const SORTS = {
-  dateDesc: { field: 'date', descending: true },
-  dateAsc: { field: 'date', descending: false },
-  rateDesc: { field: 'rating', descending: true },
-  rateAsc: { field: 'rating', descending: false },
-  helpfulDesc: { field: 'votes_up', descending: true }
+  relevance: { sort: 'smart' },
+  dateDesc: { sort: 'date' },
+  dateAsc: { sort: 'date', direction: 'asc' },
+  rateDesc: { sort: 'rating' },
+  rateAsc: { sort: 'rating', direction: 'asc' },
+  helpfulDesc: { sort: 'votes_up' }
 }
-// filter.json names the rating field `score`.
-const FILTER_SORT_FIELDS = { date: 'date', rating: 'score', votes_up: 'votes_up' }
 
 /**
  * @param {*} value A pipeline input.
@@ -59,7 +61,7 @@ function toUtcDate (value) {
  * @returns {{ average: number, count: number, distribution: Object }}
  */
 function buildRatingSummary (bottomline) {
-  const { average_score: averageScore, total_review: totalReview, star_distribution: stars } = bottomline || {}
+  const { averageScore, totalReview, starDistribution: stars } = bottomline || {}
   const distribution = {}
 
   for (const star of STARS) {
@@ -106,42 +108,43 @@ function mapReview (row) {
   const review = {
     id: String(row.id),
     rate: Math.round(toNumber(row.score) * RATING_SCALE_FACTOR),
-    author: (row.user && row.user.display_name) || '',
+    author: (row.user && row.user.displayName) || '',
     title: row.title || '',
     review: row.content || ''
   }
 
-  if (typeof row.created_at === 'string' && row.created_at.length > 0) {
-    review.date = row.created_at
+  const date = toUtcDate(row.createdAt)
+  if (date) {
+    review.date = date
   }
 
-  if (typeof row.verified_buyer === 'boolean') {
-    review.isVerified = row.verified_buyer
+  if (typeof row.verifiedBuyer === 'boolean') {
+    review.isVerified = row.verifiedBuyer
   }
 
   const comment = row.comment
   if (comment && typeof comment.content === 'string' && comment.content.trim().length > 0) {
     review.merchantReply = { reply: comment.content }
-    const date = toUtcDate(comment.created_at)
-    if (date) {
-      review.merchantReply.date = date
+    const replyDate = toUtcDate(comment.createdAt)
+    if (replyDate) {
+      review.merchantReply.date = replyDate
     }
   }
 
-  const media = (Array.isArray(row.images_data) ? row.images_data : [])
-    .filter(image => image && typeof image.original_url === 'string' && image.original_url.length > 0)
-    .map(image => ({ type: 'image', url: image.original_url }))
+  const media = (Array.isArray(row.imagesData) ? row.imagesData : [])
+    .filter(image => image && typeof image.originalUrl === 'string' && image.originalUrl.length > 0)
+    .map(image => ({ type: 'image', url: image.originalUrl }))
   if (media.length > 0) {
     review.media = media
   }
 
-  const customFields = mapCustomFields(row.custom_fields)
+  const customFields = mapCustomFields(row.customFields)
   if (customFields.length > 0) {
     review.customFields = customFields
   }
 
-  if (typeof row.votes_up === 'number' && typeof row.votes_down === 'number') {
-    review.reviewVotes = { up: row.votes_up, down: row.votes_down }
+  if (typeof row.votesUp === 'number' && typeof row.votesDown === 'number') {
+    review.reviewVotes = { up: row.votesUp, down: row.votesDown }
   }
 
   return review
@@ -165,17 +168,17 @@ function mapReview (row) {
 module.exports = async (context, input) => {
   const productId = input.baseProductId || input.productId
   const client = new YotpoClient(context)
-  // The cursor is Yotpo's row position, so rows the step drops or the PWA de-duplicates cannot
-  // shift the next page.
+  // The cursor is Yotpo's row position, so a review that moves between two requests and that the
+  // PWA de-duplicates cannot shift the next page.
+  const requestedOffset = toCount(input.offset, 0)
   const offset = typeof input.after === 'string' && CURSOR_PATTERN.test(input.after)
     ? Number(input.after)
-    : toCount(input.offset, 0)
+    : (requestedOffset <= MAX_POSITION ? requestedOffset : 0)
   const limit = Math.min(toCount(input.limit, DEFAULT_LIMIT), MAX_LIMIT)
   const perPage = Math.max(limit, 1)
   const sort = SORTS[input.sort]
   const filterRate = STARS.includes(input.filterRate) ? input.filterRate : null
   const filterMedia = input.filterMedia === true
-  // reviews.json applies `star` to the rows but not to its count, so filtered lists use filter.json.
   const isFiltered = filterRate !== null || filterMedia
 
   if (typeof productId !== 'string' || !PRODUCT_ID_PATTERN.test(productId)) {
@@ -186,23 +189,10 @@ module.exports = async (context, input) => {
     }
   }
 
-  const fetchPage = (page) => {
-    const qs = { page, per_page: perPage }
-
-    if (isFiltered) {
-      return client.filterReviews({
-        domain_key: productId,
-        ...(filterRate !== null && { scores: [filterRate] }),
-        ...(filterMedia && { pictured: true }),
-        ...(sort && { sortings: [{ sort_by: FILTER_SORT_FIELDS[sort.field], ascending: !sort.descending }] })
-      }, qs)
-    }
-
-    return client.getReviews(productId, {
-      ...qs,
-      ...(sort && { sort: sort.field, direction: sort.descending ? 'desc' : 'asc' })
-    })
-  }
+  const filters = isFiltered
+    ? { ...(filterRate !== null && { scores: [filterRate] }), ...(filterMedia && { pictured: true }) }
+    : undefined
+  const fetchPage = page => client.getReviews(productId, { page, perPage, ...sort }, filters)
 
   // A position that is no multiple of the page size spans two Yotpo pages of the same size.
   const skip = limit === 0 ? 0 : offset % perPage
