@@ -1,0 +1,16 @@
+{
+  "name": "@shopgate-project/yotpo-reviews",
+  "version": "2.0.0",
+  "description": "Backend steps for the Shopgate Yotpo reviews extension (product reviews data provider).",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {}
+}

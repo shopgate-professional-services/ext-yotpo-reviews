@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "pipeline": {
+    "id": "shopgate.catalog.getProductReviewSettings.v1",
+    "input": [],
+    "steps": [
+      {
+        "id": "@shopgate-project/yotpo-reviews",
+        "path": "@shopgate-project/yotpo-reviews/lib/reviews/getProductReviewSettings.js",
+        "type": "extension",
+        "input": [],
+        "output": [
+          { "id": "100", "key": "features" },
+          { "id": "101", "key": "paginationType" },
+          { "id": "102", "key": "customFields" },
+          { "id": "103", "key": "sortOptions", "optional": true }
+        ]
+      }
+    ],
+    "output": [
+      { "id": "100", "key": "features" },
+      { "id": "101", "key": "paginationType" },
+      { "id": "102", "key": "customFields" },
+      { "id": "103", "key": "sortOptions", "optional": true }
+    ],
+    "public": true
+  }
+}
