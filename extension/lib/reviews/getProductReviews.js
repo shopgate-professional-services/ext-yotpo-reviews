@@ -1,0 +1,225 @@
+'use strict'
+
+const YotpoClient = require('../yotpo/YotpoClient')
+
+const RATING_SCALE_FACTOR = 20
+const STARS = [5, 4, 3, 2, 1]
+const DEFAULT_LIMIT = 10
+const MAX_LIMIT = 150
+// Yotpo product ids allow only these characters; others could also alter the request path.
+const PRODUCT_ID_PATTERN = /^[A-Za-z0-9_-]+$/
+
+// Shopgate sort value to Yotpo sort field and direction. `relevance` and unknown values send
+// no sort, which gives Yotpo's own ranking.
+const SORTS = {
+  dateDesc: { field: 'date', descending: true },
+  dateAsc: { field: 'date', descending: false },
+  rateDesc: { field: 'rating', descending: true },
+  rateAsc: { field: 'rating', descending: false },
+  helpfulDesc: { field: 'votes_up', descending: true }
+}
+// filter.json names the rating field `score`.
+const FILTER_SORT_FIELDS = { date: 'date', rating: 'score', votes_up: 'votes_up' }
+
+/**
+ * @param {*} value A pipeline input.
+ * @param {number} fallback The value for a missing or invalid input.
+ * @returns {number} A non-negative integer.
+ */
+function toCount (value, fallback) {
+  return Number.isInteger(value) && value >= 0 ? value : fallback
+}
+
+/**
+ * @param {*} value A Yotpo number.
+ * @returns {number} The number, or 0 when it is not a finite number.
+ */
+function toNumber (value) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
+}
+
+/**
+ * @param {string} [value] A Yotpo timestamp.
+ * @returns {string|undefined} The timestamp, marked as UTC when Yotpo sent it without a zone.
+ */
+function toUtcDate (value) {
+  if (typeof value !== 'string' || value.length === 0) {
+    return undefined
+  }
+
+  return /(Z|[+-]\d{2}:?\d{2})$/i.test(value) ? value : `${value}Z`
+}
+
+/**
+ * Builds the unfiltered rating summary from Yotpo's bottomline. A product without reviews gets
+ * zeros, because a response without summary would keep the one the PWA stored before.
+ * @param {Object} [bottomline] The Yotpo bottomline.
+ * @returns {{ average: number, count: number, distribution: Object }}
+ */
+function buildRatingSummary (bottomline) {
+  const { average_score: averageScore, total_review: totalReview, star_distribution: stars } = bottomline || {}
+  const distribution = {}
+
+  for (const star of STARS) {
+    const count = stars && stars[star]
+    distribution[star] = Number.isInteger(count) && count > 0 ? count : 0
+  }
+
+  return {
+    // Rounded to one decimal star first, because the PWA shows `average / 20` with one decimal.
+    average: Math.round(toNumber(averageScore) * 10) * (RATING_SCALE_FACTOR / 10),
+    count: Number.isInteger(totalReview) && totalReview > 0 ? totalReview : 0,
+    distribution
+  }
+}
+
+/**
+ * @param {Object} [customFields] Yotpo custom fields by field id.
+ * @returns {Object[]} Label/value pairs with content.
+ */
+function mapCustomFields (customFields) {
+  if (!customFields || typeof customFields !== 'object') {
+    return []
+  }
+
+  return Object.keys(customFields)
+    .map((key) => {
+      const field = customFields[key] || {}
+      const value = Array.isArray(field.value) ? field.value.join(', ') : field.value
+      return {
+        label: typeof field.title === 'string' ? field.title.trim() : '',
+        value: value === undefined || value === null ? '' : String(value).trim()
+      }
+    })
+    .filter(field => field.label && field.value)
+}
+
+/**
+ * Maps a Yotpo review into the Shopgate review shape. Optional fields without data are left
+ * out, because a missing value differs from `false` or an empty list.
+ * @param {Object} row The Yotpo review.
+ * @returns {Object}
+ */
+function mapReview (row) {
+  const review = {
+    id: String(row.id),
+    rate: Math.round(toNumber(row.score) * RATING_SCALE_FACTOR),
+    author: (row.user && row.user.display_name) || '',
+    title: row.title || '',
+    review: row.content || ''
+  }
+
+  if (typeof row.created_at === 'string' && row.created_at.length > 0) {
+    review.date = row.created_at
+  }
+
+  if (typeof row.verified_buyer === 'boolean') {
+    review.isVerified = row.verified_buyer
+  }
+
+  const comment = row.comment
+  if (comment && typeof comment.content === 'string' && comment.content.trim().length > 0) {
+    review.merchantReply = { reply: comment.content }
+    const date = toUtcDate(comment.created_at)
+    if (date) {
+      review.merchantReply.date = date
+    }
+  }
+
+  const media = (Array.isArray(row.images_data) ? row.images_data : [])
+    .filter(image => image && typeof image.original_url === 'string' && image.original_url.length > 0)
+    .map(image => ({ type: 'image', url: image.original_url }))
+  if (media.length > 0) {
+    review.media = media
+  }
+
+  const customFields = mapCustomFields(row.custom_fields)
+  if (customFields.length > 0) {
+    review.customFields = customFields
+  }
+
+  if (typeof row.votes_up === 'number' && typeof row.votes_down === 'number') {
+    review.reviewVotes = { up: row.votes_up, down: row.votes_down }
+  }
+
+  return review
+}
+
+/**
+ * Yotpo-backed implementation of shopgate.catalog.getProductReviews.v1. Runs only when Yotpo
+ * reviews are enabled. A failed Yotpo request throws, so the PWA shows its error state.
+ * @param {Object} context The pipeline context.
+ * @param {Object} input Pipeline input.
+ * @param {string} input.productId The requested product id.
+ * @param {string} [input.baseProductId] The resolved base product id.
+ * @param {number} [input.offset] Number of reviews to skip.
+ * @param {number} [input.limit] Page size.
+ * @param {string} [input.sort] Shopgate sort value.
+ * @param {boolean} [input.filterMedia] Keeps only reviews with images.
+ * @param {number} [input.filterRate] Keeps only reviews with this number of stars (1-5).
+ * @returns {Promise<{ reviews: Object[], totalReviewCount: number, ratingSummary: (Object|undefined) }>}
+ */
+module.exports = async (context, input) => {
+  const productId = input.baseProductId || input.productId
+  const client = new YotpoClient(context)
+  const offset = toCount(input.offset, 0)
+  const limit = Math.min(toCount(input.limit, DEFAULT_LIMIT), MAX_LIMIT)
+  const perPage = Math.max(limit, 1)
+  const sort = SORTS[input.sort]
+  const filterRate = STARS.includes(input.filterRate) ? input.filterRate : null
+  const filterMedia = input.filterMedia === true
+  // reviews.json applies `star` to the rows but not to its count, so filtered lists use filter.json.
+  const isFiltered = filterRate !== null || filterMedia
+
+  if (typeof productId !== 'string' || !PRODUCT_ID_PATTERN.test(productId)) {
+    return {
+      reviews: [],
+      totalReviewCount: 0,
+      ...(!isFiltered && { ratingSummary: buildRatingSummary() })
+    }
+  }
+
+  const fetchPage = (page) => {
+    const qs = { page, per_page: perPage }
+
+    if (isFiltered) {
+      return client.filterReviews({
+        domain_key: productId,
+        ...(filterRate !== null && { scores: [filterRate] }),
+        ...(filterMedia && { pictured: true }),
+        ...(sort && { sortings: [{ sort_by: FILTER_SORT_FIELDS[sort.field], ascending: !sort.descending }] })
+      }, qs)
+    }
+
+    return client.getReviews(productId, {
+      ...qs,
+      ...(sort && { sort: sort.field, direction: sort.descending ? 'desc' : 'asc' })
+    })
+  }
+
+  // Load more sends the de-duplicated store length, which need not be a multiple of the page
+  // size. Such a window spans two Yotpo pages of the same size.
+  const skip = limit === 0 ? 0 : offset % perPage
+  const firstPage = limit === 0 ? 1 : Math.floor(offset / perPage) + 1
+  const pages = skip === 0 ? [firstPage] : [firstPage, firstPage + 1]
+  const responses = await Promise.all(pages.map(fetchPage))
+
+  const rows = responses
+    .map(response => (Array.isArray(response.reviews) ? response.reviews : []))
+    .reduce((all, list) => all.concat(list), [])
+  const first = responses[0]
+
+  const result = {
+    reviews: rows
+      .slice(skip, skip + limit)
+      .filter(row => row && row.deleted !== true)
+      .map(mapReview),
+    totalReviewCount: toCount(first.pagination && first.pagination.total, 0)
+  }
+
+  if (!isFiltered) {
+    result.ratingSummary = buildRatingSummary(first.bottomline)
+  }
+
+  return result
+}

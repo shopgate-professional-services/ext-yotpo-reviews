@@ -1,30 +1,17 @@
 {
-  "version": "1.1.4",
+  "version": "2.0.0",
   "id": "@shopgate-project/yotpo-reviews",
-  "components": [
-    {
-      "id": "ProductReviewsPortal",
-      "path": "frontend/portals/ProductReviews",
-      "target": "product.reviews",
-      "type": "portals"
-    },
-    {
-      "id": "ProductInfoAfterPortal",
-      "path": "frontend/portals/ProductInfoAfter",
-      "target": "product.info.after",
-      "type": "portals"
-    }
-  ],
+  "components": [],
   "configuration": {
     "yotpoAppKey": {
       "type": "admin",
-      "destination": "frontend",
-      "default": null,
+      "destination": "backend",
+      "default": "",
       "params": {
-        "required": true,
         "type": "string",
         "label": "Yotpo App Key"
       }
     }
-  }
+  },
+  "steps": []
 }

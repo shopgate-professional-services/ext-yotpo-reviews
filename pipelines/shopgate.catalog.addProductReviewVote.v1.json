@@ -1,0 +1,24 @@
+{
+  "version": "1",
+  "pipeline": {
+    "id": "shopgate.catalog.addProductReviewVote.v1",
+    "input": [
+      { "id": "1", "key": "reviewId" },
+      { "id": "2", "key": "vote" }
+    ],
+    "steps": [
+      {
+        "id": "@shopgate-project/yotpo-reviews",
+        "path": "@shopgate-project/yotpo-reviews/lib/reviews/addProductReviewVote.js",
+        "type": "extension",
+        "input": [
+          { "id": "1", "key": "reviewId" },
+          { "id": "2", "key": "vote" }
+        ],
+        "output": []
+      }
+    ],
+    "output": [],
+    "public": true
+  }
+}

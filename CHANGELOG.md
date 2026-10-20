@@ -2,6 +2,21 @@
  All notable changes to this project will be documented in this file.
  The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - Unreleased
+Requires a PWA with Reviews V2 (theme-ios11). Shops on an older PWA stay on 1.1.x.
+
+### Added
+- Added Yotpo as review provider for the Reviews V2 UI through overrides of `shopgate.catalog.getProductReviews.v1` and `shopgate.catalog.getProductReviewSettings.v1`.
+- Added the rating summary with star distribution, sorting (relevance, date, rating, most helpful) and the filters "stars" and "with media".
+- Added verified buyer badges, merchant replies, review images, custom fields and vote counts.
+- Added helpfulness voting through `shopgate.catalog.addProductReviewVote.v1`.
+
+### Changed
+- The Yotpo App Key is now a backend setting. Without a key the shop's default reviews are used.
+
+### Removed
+- Removed the Yotpo widgets (reviews widget, bottom line and Yotpo's write form) and the `product.reviews` and `product.info.after` portals.
+
 ## [1.1.3] - 2020-05-28
 - Fixed: font sizing for avg-score class
 
