@@ -7,7 +7,7 @@ describe('getProductReviewSettings', () => {
   it('reports the Yotpo capabilities with an app key', async () => {
     await expect(getProductReviewSettings({ config: { yotpoAppKey: 'app_key' } })).resolves.toEqual({
       features: ['filterRate', 'filterMedia', 'ratingSummary', 'reviewVotes'],
-      paginationType: 'offset',
+      paginationType: 'cursor',
       customFields: [],
       sortOptions: ['relevance', 'dateDesc', 'dateAsc', 'rateDesc', 'rateAsc', 'helpfulDesc']
     })

@@ -276,6 +276,125 @@ describe('getProductReviews', () => {
     })
   })
 
+  describe('cursor', () => {
+    it('continues at the Yotpo position of the cursor', async () => {
+      const context = createContext(yotpo(rows(25)))
+
+      const first = await getProductReviews(context, { productId: '123', limit: 10 })
+      const second = await getProductReviews(context, { productId: '123', limit: 10, after: first.cursors.after })
+      const third = await getProductReviews(context, { productId: '123', limit: 10, after: second.cursors.after })
+
+      expect(first.cursors).toEqual({ after: '10' })
+      expect(second.reviews.map(review => review.id)).toEqual(rows(10, 11).map(review => String(review.id)))
+      expect(second.cursors).toEqual({ after: '20' })
+      expect(third.reviews.map(review => review.id)).toEqual(['21', '22', '23', '24', '25'])
+      expect(third).not.toHaveProperty('cursors')
+    })
+
+    it('reaches the end although a deleted review was left out', async () => {
+      const list = rows(12)
+      list[2] = row(3, { deleted: true })
+      const context = createContext(yotpo(list))
+      const loaded = []
+      let after
+      let requests = 0
+
+      do {
+        const result = await getProductReviews(context, { productId: '123', limit: 10, ...(after && { after }) })
+        loaded.push(...result.reviews.map(review => review.id))
+        after = result.cursors && result.cursors.after
+        requests += 1
+      } while (after && requests < 5)
+
+      expect(requests).toBe(2)
+      expect(loaded).toEqual(['1', '2', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
+    })
+
+    it('sends no cursor for the last full page and for an empty list', async () => {
+      const full = createContext(yotpo(rows(10)))
+      const empty = createContext(yotpo([]))
+
+      expect(await getProductReviews(full, { productId: '123', limit: 10 })).not.toHaveProperty('cursors')
+      expect(await getProductReviews(empty, { productId: '123', limit: 10 })).not.toHaveProperty('cursors')
+    })
+
+    it('continues a filtered list at the cursor and ends on its last page', async () => {
+      const middle = createContext(yotpo(rows(25)))
+      const last = createContext(yotpo(rows(15)))
+
+      const continued = await getProductReviews(middle, { productId: '123', limit: 10, after: '10', filterRate: 5 })
+      const ended = await getProductReviews(last, { productId: '123', limit: 10, after: '10', filterRate: 5 })
+
+      expect(middle.requests[0]).toMatchObject({ uri: FILTER_URI, qs: { page: 2, per_page: 10 } })
+      expect(continued.cursors).toEqual({ after: '20' })
+      expect(ended.reviews).toHaveLength(5)
+      expect(ended).not.toHaveProperty('cursors')
+    })
+
+    it('continues at a cursor that is no multiple of the page size', async () => {
+      const context = createContext(yotpo(rows(25)))
+
+      const result = await getProductReviews(context, { productId: '123', limit: 10, after: '15' })
+
+      expect(result.reviews.map(review => review.id)).toEqual(rows(10, 16).map(review => String(review.id)))
+      expect(result).not.toHaveProperty('cursors')
+    })
+
+    it('continues after an unaligned cursor with the next position', async () => {
+      const context = createContext(yotpo(rows(25)))
+
+      const result = await getProductReviews(context, { productId: '123', limit: 10, after: '5' })
+
+      expect(result.reviews.map(review => review.id)).toEqual(rows(10, 6).map(review => String(review.id)))
+      expect(result.cursors).toEqual({ after: '15' })
+    })
+
+    it('ends when Yotpo counts more reviews than it returns', async () => {
+      const short = createContext(yotpo(rows(10), { total: 25 }))
+      const countOnly = createContext(yotpo(rows(3)))
+
+      expect(await getProductReviews(short, { productId: '123', limit: 10, after: '10' })).not.toHaveProperty('cursors')
+      expect(await getProductReviews(countOnly, { productId: '123', limit: 0 })).not.toHaveProperty('cursors')
+    })
+
+    it('prefers the cursor over an offset', async () => {
+      const context = createContext(yotpo(rows(25)))
+
+      const result = await getProductReviews(context, { productId: '123', limit: 10, after: '20', offset: 3 })
+
+      expect(result.reviews.map(review => review.id)).toEqual(['21', '22', '23', '24', '25'])
+    })
+
+    it('reaches the end when the CDN repeats a review on the next page', async () => {
+      const context = createContext((options) => {
+        const page = options.qs.page
+        const start = page === 2 ? 9 : (page - 1) * 10
+        return ok({ pagination: { total: 25 }, bottomline: BOTTOMLINE, reviews: rows(25).slice(start, start + 10) })
+      })
+      const loaded = []
+      let after
+      let requests = 0
+
+      do {
+        const result = await getProductReviews(context, { productId: '123', limit: 10, ...(after && { after }) })
+        loaded.push(...result.reviews.map(review => review.id))
+        after = result.cursors && result.cursors.after
+        requests += 1
+      } while (after && requests < 5)
+
+      expect(requests).toBe(3)
+      expect(new Set(loaded).size).toBe(24)
+    })
+
+    it.each([['abc'], ['-5'], ['1.5'], [12], ['9'.repeat(10)], ['9'.repeat(400)]])('ignores the invalid cursor %p', async (after) => {
+      const context = createContext(yotpo(rows(25)))
+
+      await getProductReviews(context, { productId: '123', limit: 10, after })
+
+      expect(context.requests[0].qs.page).toBe(1)
+    })
+  })
+
   describe('rating summary', () => {
     it('maps the bottomline of an unfiltered list', async () => {
       const context = createContext(yotpo(rows(1)))

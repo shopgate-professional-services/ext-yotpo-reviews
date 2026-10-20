@@ -10,6 +10,7 @@ Requires a PWA with Reviews V2 (theme-ios11). Shops on an older PWA stay on 1.1.
 - Added the rating summary with star distribution, sorting (relevance, date, rating, most helpful) and the filters "stars" and "with media".
 - Added verified buyer badges, merchant replies, review images, custom fields and vote counts.
 - Added helpfulness voting through `shopgate.catalog.addProductReviewVote.v1`.
+- Added cursor pagination of the review list (load more continues at Yotpo's position).
 
 ### Changed
 - The Yotpo App Key is now a backend setting. Without a key the shop's default reviews are used.

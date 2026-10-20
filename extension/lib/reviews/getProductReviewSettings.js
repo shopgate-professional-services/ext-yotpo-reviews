@@ -17,7 +17,7 @@ module.exports = async (context) => {
 
   return {
     features: enableReviews ? FEATURES : [],
-    paginationType: 'offset',
+    paginationType: enableReviews ? 'cursor' : 'offset',
     customFields: [],
     sortOptions: enableReviews ? SORT_OPTIONS : []
   }

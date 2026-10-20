@@ -8,6 +8,8 @@ const DEFAULT_LIMIT = 10
 const MAX_LIMIT = 150
 // Yotpo product ids allow only these characters; others could also alter the request path.
 const PRODUCT_ID_PATTERN = /^[A-Za-z0-9_-]+$/
+// Bounded so that a crafted cursor on the public pipeline stays a safe page number.
+const CURSOR_PATTERN = /^\d{1,9}$/
 
 // Shopgate sort value to Yotpo sort field and direction. `relevance` and unknown values send
 // no sort, which gives Yotpo's own ranking.
@@ -152,17 +154,22 @@ function mapReview (row) {
  * @param {Object} input Pipeline input.
  * @param {string} input.productId The requested product id.
  * @param {string} [input.baseProductId] The resolved base product id.
- * @param {number} [input.offset] Number of reviews to skip.
+ * @param {string} [input.after] Cursor from the previous page: the Yotpo position to continue at.
+ * @param {number} [input.offset] Number of reviews to skip when no cursor is sent.
  * @param {number} [input.limit] Page size.
  * @param {string} [input.sort] Shopgate sort value.
  * @param {boolean} [input.filterMedia] Keeps only reviews with images.
  * @param {number} [input.filterRate] Keeps only reviews with this number of stars (1-5).
- * @returns {Promise<{ reviews: Object[], totalReviewCount: number, ratingSummary: (Object|undefined) }>}
+ * @returns {Promise<{ reviews: Object[], totalReviewCount: number, cursors: (Object|undefined), ratingSummary: (Object|undefined) }>}
  */
 module.exports = async (context, input) => {
   const productId = input.baseProductId || input.productId
   const client = new YotpoClient(context)
-  const offset = toCount(input.offset, 0)
+  // The cursor is Yotpo's row position, so rows the step drops or the PWA de-duplicates cannot
+  // shift the next page.
+  const offset = typeof input.after === 'string' && CURSOR_PATTERN.test(input.after)
+    ? Number(input.after)
+    : toCount(input.offset, 0)
   const limit = Math.min(toCount(input.limit, DEFAULT_LIMIT), MAX_LIMIT)
   const perPage = Math.max(limit, 1)
   const sort = SORTS[input.sort]
@@ -197,8 +204,7 @@ module.exports = async (context, input) => {
     })
   }
 
-  // Load more sends the de-duplicated store length, which need not be a multiple of the page
-  // size. Such a window spans two Yotpo pages of the same size.
+  // A position that is no multiple of the page size spans two Yotpo pages of the same size.
   const skip = limit === 0 ? 0 : offset % perPage
   const firstPage = limit === 0 ? 1 : Math.floor(offset / perPage) + 1
   const pages = skip === 0 ? [firstPage] : [firstPage, firstPage + 1]
@@ -209,12 +215,19 @@ module.exports = async (context, input) => {
     .reduce((all, list) => all.concat(list), [])
   const first = responses[0]
 
+  const pageRows = rows.slice(skip, skip + limit)
+  const totalReviewCount = toCount(first.pagination && first.pagination.total, 0)
+  const next = offset + pageRows.length
+
   const result = {
-    reviews: rows
-      .slice(skip, skip + limit)
+    reviews: pageRows
       .filter(row => row && row.deleted !== true)
       .map(mapReview),
-    totalReviewCount: toCount(first.pagination && first.pagination.total, 0)
+    totalReviewCount
+  }
+
+  if (pageRows.length > 0 && next < totalReviewCount) {
+    result.cursors = { after: String(next) }
   }
 
   if (!isFiltered) {

@@ -33,12 +33,13 @@ pipelines in `pipelines/`, steps in `extension/lib/`. No frontend component.
 - `reviews.json` applies `star` to the rows but not to `pagination.total` or the
   bottomline. Filtered lists therefore use `filter.json`, which counts correctly but has
   no bottomline; only unfiltered responses carry `ratingSummary`.
-- Load more sends the de-duplicated store length as `offset`, which need not be a
-  multiple of `limit`. Such a window reads two Yotpo pages of size `limit` and slices.
-  After a duplicate every later page re-delivers one review, so load more can end
-  without adding one; skipped `deleted` rows have the same effect if Yotpo counts them.
-  The window assumes a full first page; if the CDN serves a shorter one, a review is
-  skipped.
+- With an app key pagination is `cursor`: `cursors.after` is Yotpo's row position after
+  the delivered page, and the next request continues there. Don't go back to `offset`:
+  the PWA would send its de-duplicated store length, which falls behind Yotpo's position
+  whenever the step drops a `deleted` row or the CDN serves overlapping pages, and load
+  more then never ends. No cursor means the last page. A position that is no multiple of
+  `limit` reads two Yotpo pages and slices; if the CDN serves a short page, a review can
+  be skipped.
 - `addProductReviewVote.v1` is public and puts the review id into the request path:
   only numeric ids are forwarded. It returns no counts; the PWA raises its count by one.
   Yotpo checks neither the account nor repeats, so the pipeline is an anonymous vote proxy

@@ -8,6 +8,7 @@
       { "id": "3", "key": "limit", "optional": true },
       { "id": "4", "key": "sort", "optional": true },
       { "id": "5", "key": "filterEmpty", "optional": true },
+      { "id": "6", "key": "after", "optional": true },
       { "id": "7", "key": "filterMedia", "optional": true },
       { "id": "8", "key": "filterVerified", "optional": true },
       { "id": "9", "key": "filterRate", "optional": true },
@@ -46,6 +47,7 @@
             { "id": "3", "key": "limit", "optional": true },
             { "id": "4", "key": "sort", "optional": true },
             { "id": "5", "key": "filterEmpty", "optional": true },
+            { "id": "6", "key": "after", "optional": true },
             { "id": "7", "key": "filterMedia", "optional": true },
             { "id": "8", "key": "filterVerified", "optional": true },
             { "id": "9", "key": "filterRate", "optional": true }
@@ -53,6 +55,7 @@
           "output": [
             { "id": "200", "key": "totalReviewCount" },
             { "id": "201", "key": "reviews" },
+            { "id": "205", "key": "cursors", "optional": true },
             { "id": "204", "key": "ratingSummary", "optional": true }
           ]
         },
@@ -171,6 +174,7 @@
     "output": [
       { "id": "200", "key": "totalReviewCount" },
       { "id": "201", "key": "reviews" },
+      { "id": "205", "key": "cursors", "optional": true },
       { "id": "204", "key": "ratingSummary", "optional": true }
     ],
     "public": true
