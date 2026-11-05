@@ -11,8 +11,9 @@ and update it in the same PR when behavior drifts from the code.
 ## What this is
 
 Shopgate Connect extension `@shopgate-project/yotpo-reviews`: a review provider for the
-PWA's Reviews V2 UI (requires a PWA with Reviews V2 since 2.0.0). Backend only:
-pipelines in `pipelines/`, steps in `extension/lib/`. No frontend component.
+PWA's Reviews V2 UI (requires a PWA with Reviews V2, Engage 7.34.0 or later, since
+2.0.0). Backend only: pipelines in `pipelines/`, steps in `extension/lib/`. No frontend
+component.
 
 `extension/` is CommonJS in `standard` style (no semicolons), without a lint setup.
 

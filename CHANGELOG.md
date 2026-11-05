@@ -2,8 +2,8 @@
  All notable changes to this project will be documented in this file.
  The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.0.0] - Unreleased
-Requires a PWA with Reviews V2 (theme-ios11). Shops on an older PWA stay on 1.1.x.
+## [2.0.0] - 2026-11-05
+Requires a PWA with Reviews V2, Engage 7.34.0 or later (theme-ios11). Shops on an older PWA stay on 1.1.x.
 
 ### Added
 - Added Yotpo as review provider for the Reviews V2 UI through overrides of `shopgate.catalog.getProductReviews.v1` and `shopgate.catalog.getProductReviewSettings.v1`, with cursor pagination for load more.

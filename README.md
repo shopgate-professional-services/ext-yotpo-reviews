@@ -3,8 +3,8 @@
 Shows [Yotpo](https://www.yotpo.com/) product reviews in the Shopgate app, using the
 app's Reviews V2 UI (no Yotpo widgets).
 
-> **Version 2.x requires a PWA with Reviews V2** (theme-ios11). Shops on an older PWA
-> stay on 1.1.x, which embeds Yotpo's widgets.
+> **Version 2.x requires a PWA with Reviews V2, Engage 7.34.0 or later** (theme-ios11).
+> Shops on an older PWA stay on 1.1.x, which embeds Yotpo's widgets.
 
 ## Quick setup (for Support)
 
