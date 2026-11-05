@@ -1,0 +1,182 @@
+{
+  "version": "1",
+  "pipeline": {
+    "id": "shopgate.catalog.getProductReviews.v1",
+    "input": [
+      { "id": "1", "key": "productId" },
+      { "id": "2", "key": "offset", "optional": true },
+      { "id": "3", "key": "limit", "optional": true },
+      { "id": "4", "key": "sort", "optional": true },
+      { "id": "5", "key": "filterEmpty", "optional": true },
+      { "id": "6", "key": "after", "optional": true },
+      { "id": "7", "key": "filterMedia", "optional": true },
+      { "id": "8", "key": "filterVerified", "optional": true },
+      { "id": "9", "key": "filterRate", "optional": true },
+      { "id": "202", "key": "sgxsMeta" }
+    ],
+    "steps": [
+      {
+        "id": "@shopgate-project/yotpo-reviews",
+        "path": "@shopgate-project/yotpo-reviews/lib/reviews/resolveReviewsConfig.js",
+        "type": "extension",
+        "input": [],
+        "output": [
+          { "id": "300", "key": "enableReviews" }
+        ]
+      },
+      {
+        "id": "shopgate.catalog.getProduct.v1",
+        "type": "pipeline",
+        "input": [
+          { "id": "1", "key": "productId" },
+          { "id": "202", "key": "sgxsMeta" }
+        ],
+        "output": [
+          { "id": "203", "key": "baseProductId", "optional": true }
+        ]
+      },
+      {
+        "then": {
+          "id": "@shopgate-project/yotpo-reviews",
+          "path": "@shopgate-project/yotpo-reviews/lib/reviews/getProductReviews.js",
+          "type": "extension",
+          "input": [
+            { "id": "1", "key": "productId" },
+            { "id": "203", "key": "baseProductId", "optional": true },
+            { "id": "2", "key": "offset", "optional": true },
+            { "id": "3", "key": "limit", "optional": true },
+            { "id": "4", "key": "sort", "optional": true },
+            { "id": "5", "key": "filterEmpty", "optional": true },
+            { "id": "6", "key": "after", "optional": true },
+            { "id": "7", "key": "filterMedia", "optional": true },
+            { "id": "8", "key": "filterVerified", "optional": true },
+            { "id": "9", "key": "filterRate", "optional": true }
+          ],
+          "output": [
+            { "id": "200", "key": "totalReviewCount" },
+            { "id": "201", "key": "reviews" },
+            { "id": "205", "key": "cursors", "optional": true },
+            { "id": "204", "key": "ratingSummary", "optional": true }
+          ]
+        },
+        "type": "conditional",
+        "input": [
+          { "id": "300", "key": "enableReviews" }
+        ],
+        "expression": {
+          "ok": [
+            { "name": "enableReviews" }
+          ]
+        }
+      },
+      {
+        "then": {
+          "id": "@shopgate/reviews",
+          "path": "@shopgate/reviews/checkIfCalledOnChild.js",
+          "type": "extension",
+          "input": [
+            { "id": "203", "key": "baseProductId", "optional": true }
+          ],
+          "output": []
+        },
+        "type": "conditional",
+        "input": [
+          { "id": "300", "key": "enableReviews" }
+        ],
+        "expression": {
+          "notok": [
+            { "name": "enableReviews" }
+          ]
+        }
+      },
+      {
+        "then": {
+          "id": "@shopgate/reviews",
+          "path": "@shopgate/reviews/getProductReviews.js",
+          "type": "extension",
+          "input": [
+            { "id": "1", "key": "productId" },
+            { "id": "2", "key": "offset", "optional": true },
+            { "id": "3", "key": "limit", "optional": true },
+            { "id": "4", "key": "sort", "optional": true },
+            { "id": "5", "key": "filterEmpty", "optional": true }
+          ],
+          "output": [
+            { "id": "10", "key": "service" },
+            { "id": "11", "key": "version" },
+            { "id": "12", "key": "path" },
+            { "id": "13", "key": "method" },
+            { "id": "14", "key": "query" }
+          ]
+        },
+        "type": "conditional",
+        "input": [
+          { "id": "300", "key": "enableReviews" }
+        ],
+        "expression": {
+          "notok": [
+            { "name": "enableReviews" }
+          ]
+        }
+      },
+      {
+        "then": {
+          "id": "@shopgate/bigapi",
+          "path": "@shopgate/bigapi/big-api/getBigApiResult.js",
+          "type": "extension",
+          "input": [
+            { "id": "10", "key": "service" },
+            { "id": "11", "key": "version" },
+            { "id": "12", "key": "path" },
+            { "id": "13", "key": "method" },
+            { "id": "14", "key": "query" }
+          ],
+          "output": [
+            { "id": "100", "key": "meta" },
+            { "id": "101", "key": "reviews" }
+          ]
+        },
+        "type": "conditional",
+        "input": [
+          { "id": "300", "key": "enableReviews" }
+        ],
+        "expression": {
+          "notok": [
+            { "name": "enableReviews" }
+          ]
+        }
+      },
+      {
+        "then": {
+          "id": "@shopgate/reviews",
+          "path": "@shopgate/reviews/mapProductReviews.js",
+          "type": "extension",
+          "input": [
+            { "id": "100", "key": "meta" },
+            { "id": "101", "key": "reviews" }
+          ],
+          "output": [
+            { "id": "200", "key": "totalReviewCount" },
+            { "id": "201", "key": "reviews" }
+          ]
+        },
+        "type": "conditional",
+        "input": [
+          { "id": "300", "key": "enableReviews" }
+        ],
+        "expression": {
+          "notok": [
+            { "name": "enableReviews" }
+          ]
+        }
+      }
+    ],
+    "output": [
+      { "id": "200", "key": "totalReviewCount" },
+      { "id": "201", "key": "reviews" },
+      { "id": "205", "key": "cursors", "optional": true },
+      { "id": "204", "key": "ratingSummary", "optional": true }
+    ],
+    "public": true
+  }
+}

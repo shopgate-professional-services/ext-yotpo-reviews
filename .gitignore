@@ -61,4 +61,11 @@ typings/
 .idea/
 .vscode/
 
-frontend/config.json
+extension/config.json
+extension/package-lock.json
+
+# Local AI-assistant state (not team-shared)
+.claude/
+CLAUDE.local.md
+.cursor/
+.aider*
